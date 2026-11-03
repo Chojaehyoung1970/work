@@ -1,1 +1,332 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>영화 티어리스트</title>
+<style>
+  * { box-sizing: border-box; }
+  body {
+    font-family: "Malgun Gothic", "맑은 고딕", sans-serif;
+    margin: 0;
+    padding: 20px;
+    background: #1e1e2e;
+    color: #f0f0f0;
+  }
+  h1 {
+    text-align: center;
+    margin: 10px 0 20px;
+  }
 
+  /* 영화 추가 입력 영역 */
+  .add-box {
+    display: flex;
+    gap: 8px;
+    justify-content: center;
+    margin-bottom: 25px;
+  }
+  .add-box input {
+    width: 320px;
+    max-width: 60vw;
+    padding: 10px 12px;
+    border: none;
+    border-radius: 6px;
+    font-size: 15px;
+  }
+  .add-box button {
+    padding: 10px 18px;
+    border: none;
+    border-radius: 6px;
+    background: #4c6ef5;
+    color: #fff;
+    font-size: 15px;
+    cursor: pointer;
+  }
+  .add-box button:hover { background: #3b5bdb; }
+
+  /* 티어 한 줄 */
+  .tier-row {
+    display: flex;
+    margin-bottom: 8px;
+    border-radius: 6px;
+    overflow: hidden;
+    min-height: 70px;
+  }
+  .tier-label {
+    flex: 0 0 70px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 28px;
+    font-weight: bold;
+    color: #1e1e2e;
+  }
+  /* 티어별 색상 */
+  .label-S { background: #ffd43b; } /* 금색 */
+  .label-A { background: #ff6b6b; } /* 빨강 */
+  .label-B { background: #ffa94d; } /* 주황 */
+  .label-C { background: #4dabf7; } /* 파랑 */
+  .label-D { background: #adb5bd; } /* 회색 */
+
+  /* 카드가 놓이는 영역 */
+  .dropzone {
+    flex: 1;
+    display: flex;
+    flex-wrap: wrap;
+    align-content: flex-start;
+    gap: 6px;
+    padding: 8px;
+    background: #2a2a3c;
+    min-height: 70px;
+  }
+  .dropzone.dragover {
+    background: #3a3a52;
+    outline: 2px dashed #4c6ef5;
+    outline-offset: -4px;
+  }
+
+  /* 영화 카드 */
+  .card {
+    background: #45456a;
+    color: #fff;
+    padding: 8px 12px;
+    border-radius: 6px;
+    cursor: grab;
+    user-select: none;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 14px;
+    max-width: 220px;
+  }
+  .card .title {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+  .card.dragging { opacity: 0.4; }
+  .card .del {
+    cursor: pointer;
+    color: #ff8787;
+    font-weight: bold;
+    line-height: 1;
+  }
+  .card .del:hover { color: #ff5252; }
+
+  /* 대기 공간 */
+  .waiting-wrap {
+    margin-top: 30px;
+  }
+  .waiting-wrap h2 {
+    font-size: 18px;
+    margin-bottom: 8px;
+  }
+  #waiting {
+    background: #2a2a3c;
+    border: 1px dashed #555;
+    border-radius: 6px;
+    min-height: 80px;
+  }
+</style>
+</head>
+<body>
+  <h1>🎬 나의 영화 티어리스트</h1>
+
+  <!-- 영화 추가 -->
+  <div class="add-box">
+    <input type="text" id="movieInput" placeholder="영화 제목을 입력하세요" />
+    <button id="addBtn">추가</button>
+  </div>
+
+  <!-- 티어 목록 (JS로 채움) -->
+  <div id="tiers"></div>
+
+  <!-- 대기 공간 -->
+  <div class="waiting-wrap">
+    <h2>⌛ 미배치 영화 (대기 공간)</h2>
+    <div class="dropzone" id="waiting" data-tier="waiting"></div>
+  </div>
+
+<script>
+  // ── 설정 ──────────────────────────────────────────────
+  const TIERS = ["S", "A", "B", "C", "D"];
+  const STORAGE_KEY = "movieTierlistData";
+
+  // 데이터 구조: { waiting: [...], S: [...], A: [...], ... }
+  // 각 배열에는 영화 제목(문자열)이 들어감
+  let data = loadData();
+
+  // ── 초기 화면 그리기 ──────────────────────────────────
+  const tiersEl = document.getElementById("tiers");
+
+  TIERS.forEach(tier => {
+    const row = document.createElement("div");
+    row.className = "tier-row";
+    row.innerHTML = `
+      <div class="tier-label label-${tier}">${tier}</div>
+      <div class="dropzone" id="zone-${tier}" data-tier="${tier}"></div>
+    `;
+    tiersEl.appendChild(row);
+  });
+
+  // ── 데이터 불러오기 / 저장 ───────────────────────────
+  function loadData() {
+    const saved = localStorage.getItem(STORAGE_KEY);
+    if (saved) {
+      try { return JSON.parse(saved); } catch (e) { /* 무시 */ }
+    }
+    // 기본 구조
+    const init = { waiting: [] };
+    TIERS.forEach(t => init[t] = []);
+    return init;
+  }
+
+  function saveData() {
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
+  }
+
+  // ── 화면 렌더링 ──────────────────────────────────────
+  function render() {
+    // 모든 영역(대기 + 각 티어) 비우고 다시 그림
+    const zones = ["waiting", ...TIERS];
+    zones.forEach(key => {
+      const zone = (key === "waiting")
+        ? document.getElementById("waiting")
+        : document.getElementById("zone-" + key);
+      zone.innerHTML = "";
+      (data[key] || []).forEach(title => {
+        zone.appendChild(createCard(title));
+      });
+    });
+    saveData();
+  }
+
+  // 영화 카드 요소 만들기
+  function createCard(title) {
+    const card = document.createElement("div");
+    card.className = "card";
+    card.draggable = true;
+    card.dataset.title = title;
+
+    const span = document.createElement("span");
+    span.className = "title";
+    span.textContent = title;   // textContent 사용 → HTML 주입 방지
+
+    const del = document.createElement("span");
+    del.className = "del";
+    del.textContent = "×";
+    del.title = "삭제";
+    del.addEventListener("click", (e) => {
+      e.stopPropagation();
+      removeMovie(title);       // 확인 메시지 없이 즉시 삭제
+    });
+
+    card.appendChild(span);
+    card.appendChild(del);
+
+    // 드래그 시작/끝
+    card.addEventListener("dragstart", (e) => {
+      draggingTitle = title;
+      card.classList.add("dragging");
+      e.dataTransfer.effectAllowed = "move";
+    });
+    card.addEventListener("dragend", () => {
+      draggingTitle = null;
+      card.classList.remove("dragging");
+    });
+
+    return card;
+  }
+
+  // ── 영화 추가 / 삭제 ─────────────────────────────────
+  function addMovie(title) {
+    title = title.trim();
+    if (!title) return;
+    data.waiting.push(title);  // 새 영화는 대기 공간으로
+    render();
+  }
+
+  function removeMovie(title) {
+    // 모든 영역에서 해당 제목 제거
+    ["waiting", ...TIERS].forEach(key => {
+      data[key] = (data[key] || []).filter(t => t !== title);
+    });
+    render();
+  }
+
+  // ── 드래그 앤 드롭 처리 ──────────────────────────────
+  let draggingTitle = null;
+
+  // 커서 위치 기준으로, 어느 카드 "앞"에 삽입할지 계산
+  function getInsertBeforeCard(zone, mouseX, mouseY) {
+    const cards = [...zone.querySelectorAll(".card:not(.dragging)")];
+    for (const card of cards) {
+      const rect = card.getBoundingClientRect();
+      // 같은 줄에서 커서가 카드 중앙보다 왼쪽이거나, 커서가 카드보다 윗줄이면 그 앞에 삽입
+      if (mouseY < rect.bottom && mouseX < rect.left + rect.width / 2) {
+        return card;
+      }
+    }
+    return null; // 맨 뒤에 삽입
+  }
+
+  function setupDropzone(zone) {
+    zone.addEventListener("dragover", (e) => {
+      e.preventDefault();
+      zone.classList.add("dragover");
+    });
+    zone.addEventListener("dragleave", () => {
+      zone.classList.remove("dragover");
+    });
+    zone.addEventListener("drop", (e) => {
+      e.preventDefault();
+      zone.classList.remove("dragover");
+      if (!draggingTitle) return;
+
+      const targetTier = zone.dataset.tier;
+
+      // 삽입 위치(어느 카드 앞인지) 계산
+      const beforeCard = getInsertBeforeCard(zone, e.clientX, e.clientY);
+      const beforeTitle = beforeCard ? beforeCard.dataset.title : null;
+
+      // 1) 원래 위치에서 제거
+      ["waiting", ...TIERS].forEach(key => {
+        data[key] = (data[key] || []).filter(t => t !== draggingTitle);
+      });
+
+      // 2) 목표 티어의 알맞은 위치에 삽입
+      const arr = data[targetTier];
+      if (beforeTitle === null) {
+        arr.push(draggingTitle);              // 맨 뒤
+      } else {
+        const idx = arr.indexOf(beforeTitle); // 그 카드 앞
+        if (idx === -1) arr.push(draggingTitle);
+        else arr.splice(idx, 0, draggingTitle);
+      }
+
+      render();
+    });
+  }
+
+  // 모든 드롭존에 이벤트 연결
+  document.querySelectorAll(".dropzone").forEach(setupDropzone);
+
+  // ── 버튼 / 엔터 입력 연결 ────────────────────────────
+  const input = document.getElementById("movieInput");
+  document.getElementById("addBtn").addEventListener("click", () => {
+    addMovie(input.value);
+    input.value = "";
+    input.focus();
+  });
+  input.addEventListener("keydown", (e) => {
+    if (e.key === "Enter") {
+      addMovie(input.value);
+      input.value = "";
+    }
+  });
+
+  // ── 첫 렌더 ──────────────────────────────────────────
+  render();
+</script>
+</body>
+</html>
