@@ -18,7 +18,6 @@
     margin: 10px 0 20px;
   }
 
-  /* 영화 추가 입력 영역 */
   .add-box {
     display: flex;
     gap: 8px;
@@ -44,7 +43,6 @@
   }
   .add-box button:hover { background: #3b5bdb; }
 
-  /* 티어 한 줄 */
   .tier-row {
     display: flex;
     margin-bottom: 8px;
@@ -61,14 +59,12 @@
     font-weight: bold;
     color: #1e1e2e;
   }
-  /* 티어별 색상 */
-  .label-S { background: #ffd43b; } /* 금색 */
-  .label-A { background: #ff6b6b; } /* 빨강 */
-  .label-B { background: #ffa94d; } /* 주황 */
-  .label-C { background: #4dabf7; } /* 파랑 */
-  .label-D { background: #adb5bd; } /* 회색 */
+  .label-S { background: #ffd43b; }
+  .label-A { background: #ff6b6b; }
+  .label-B { background: #ffa94d; }
+  .label-C { background: #4dabf7; }
+  .label-D { background: #adb5bd; }
 
-  /* 카드가 놓이는 영역 */
   .dropzone {
     flex: 1;
     display: flex;
@@ -85,7 +81,6 @@
     outline-offset: -4px;
   }
 
-  /* 영화 카드 */
   .card {
     background: #45456a;
     color: #fff;
@@ -113,10 +108,7 @@
   }
   .card .del:hover { color: #ff5252; }
 
-  /* 대기 공간 */
-  .waiting-wrap {
-    margin-top: 30px;
-  }
+  .waiting-wrap { margin-top: 30px; }
   .waiting-wrap h2 {
     font-size: 18px;
     margin-bottom: 8px;
@@ -132,16 +124,13 @@
 <body>
   <h1>🎬 나의 영화 티어리스트</h1>
 
-  <!-- 영화 추가 -->
   <div class="add-box">
     <input type="text" id="movieInput" placeholder="영화 제목을 입력하세요" />
     <button id="addBtn">추가</button>
   </div>
 
-  <!-- 티어 목록 (JS로 채움) -->
   <div id="tiers"></div>
 
-  <!-- 대기 공간 -->
   <div class="waiting-wrap">
     <h2>⌛ 미배치 영화 (대기 공간)</h2>
     <div class="dropzone" id="waiting" data-tier="waiting"></div>
@@ -152,13 +141,10 @@
   const TIERS = ["S", "A", "B", "C", "D"];
   const STORAGE_KEY = "movieTierlistData";
 
-  // 데이터 구조: { waiting: [...], S: [...], A: [...], ... }
-  // 각 배열에는 영화 제목(문자열)이 들어감
   let data = loadData();
 
-  // ── 초기 화면 그리기 ──────────────────────────────────
+  // ── 티어 영역 초기 생성 ──────────────────────────────
   const tiersEl = document.getElementById("tiers");
-
   TIERS.forEach(tier => {
     const row = document.createElement("div");
     row.className = "tier-row";
@@ -169,25 +155,22 @@
     tiersEl.appendChild(row);
   });
 
-  // ── 데이터 불러오기 / 저장 ───────────────────────────
+  // ── 저장 / 불러오기 ──────────────────────────────────
   function loadData() {
     const saved = localStorage.getItem(STORAGE_KEY);
     if (saved) {
-      try { return JSON.parse(saved); } catch (e) { /* 무시 */ }
+      try { return JSON.parse(saved); } catch (e) {}
     }
-    // 기본 구조
     const init = { waiting: [] };
     TIERS.forEach(t => init[t] = []);
     return init;
   }
-
   function saveData() {
     localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
   }
 
-  // ── 화면 렌더링 ──────────────────────────────────────
+  // ── 렌더링 ───────────────────────────────────────────
   function render() {
-    // 모든 영역(대기 + 각 티어) 비우고 다시 그림
     const zones = ["waiting", ...TIERS];
     zones.forEach(key => {
       const zone = (key === "waiting")
@@ -201,7 +184,6 @@
     saveData();
   }
 
-  // 영화 카드 요소 만들기
   function createCard(title) {
     const card = document.createElement("div");
     card.className = "card";
@@ -210,7 +192,7 @@
 
     const span = document.createElement("span");
     span.className = "title";
-    span.textContent = title;   // textContent 사용 → HTML 주입 방지
+    span.textContent = title;
 
     const del = document.createElement("span");
     del.className = "del";
@@ -218,13 +200,12 @@
     del.title = "삭제";
     del.addEventListener("click", (e) => {
       e.stopPropagation();
-      removeMovie(title);       // 확인 메시지 없이 즉시 삭제
+      removeMovie(title);
     });
 
     card.appendChild(span);
     card.appendChild(del);
 
-    // 드래그 시작/끝
     card.addEventListener("dragstart", (e) => {
       draggingTitle = title;
       card.classList.add("dragging");
@@ -238,36 +219,32 @@
     return card;
   }
 
-  // ── 영화 추가 / 삭제 ─────────────────────────────────
+  // ── 추가 / 삭제 ──────────────────────────────────────
   function addMovie(title) {
     title = title.trim();
     if (!title) return;
-    data.waiting.push(title);  // 새 영화는 대기 공간으로
+    data.waiting.push(title);
     render();
   }
-
   function removeMovie(title) {
-    // 모든 영역에서 해당 제목 제거
     ["waiting", ...TIERS].forEach(key => {
       data[key] = (data[key] || []).filter(t => t !== title);
     });
     render();
   }
 
-  // ── 드래그 앤 드롭 처리 ──────────────────────────────
+  // ── 드래그 앤 드롭 ───────────────────────────────────
   let draggingTitle = null;
 
-  // 커서 위치 기준으로, 어느 카드 "앞"에 삽입할지 계산
   function getInsertBeforeCard(zone, mouseX, mouseY) {
     const cards = [...zone.querySelectorAll(".card:not(.dragging)")];
     for (const card of cards) {
       const rect = card.getBoundingClientRect();
-      // 같은 줄에서 커서가 카드 중앙보다 왼쪽이거나, 커서가 카드보다 윗줄이면 그 앞에 삽입
       if (mouseY < rect.bottom && mouseX < rect.left + rect.width / 2) {
         return card;
       }
     }
-    return null; // 맨 뒤에 삽입
+    return null;
   }
 
   function setupDropzone(zone) {
@@ -284,48 +261,49 @@
       if (!draggingTitle) return;
 
       const targetTier = zone.dataset.tier;
-
-      // 삽입 위치(어느 카드 앞인지) 계산
       const beforeCard = getInsertBeforeCard(zone, e.clientX, e.clientY);
       const beforeTitle = beforeCard ? beforeCard.dataset.title : null;
 
-      // 1) 원래 위치에서 제거
       ["waiting", ...TIERS].forEach(key => {
         data[key] = (data[key] || []).filter(t => t !== draggingTitle);
       });
 
-      // 2) 목표 티어의 알맞은 위치에 삽입
       const arr = data[targetTier];
       if (beforeTitle === null) {
-        arr.push(draggingTitle);              // 맨 뒤
+        arr.push(draggingTitle);
       } else {
-        const idx = arr.indexOf(beforeTitle); // 그 카드 앞
+        const idx = arr.indexOf(beforeTitle);
         if (idx === -1) arr.push(draggingTitle);
         else arr.splice(idx, 0, draggingTitle);
       }
-
       render();
     });
   }
-
-  // 모든 드롭존에 이벤트 연결
   document.querySelectorAll(".dropzone").forEach(setupDropzone);
 
-  // ── 버튼 / 엔터 입력 연결 ────────────────────────────
+  // ── 입력 처리 (한글 IME 중복 버그 수정) ──────────────
   const input = document.getElementById("movieInput");
+
+  // 조합 상태 플래그 (compositionstart ~ compositionend 사이)
+  let isComposing = false;
+  input.addEventListener("compositionstart", () => { isComposing = true; });
+  input.addEventListener("compositionend",   () => { isComposing = false; });
+
   document.getElementById("addBtn").addEventListener("click", () => {
     addMovie(input.value);
     input.value = "";
     input.focus();
   });
+
   input.addEventListener("keydown", (e) => {
+    // ★ 한글 조합 중 Enter → 뒷글자 중복 방지
+    if (e.isComposing || isComposing || e.keyCode === 229) return;
     if (e.key === "Enter") {
       addMovie(input.value);
       input.value = "";
     }
   });
 
-  // ── 첫 렌더 ──────────────────────────────────────────
   render();
 </script>
 </body>
