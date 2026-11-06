@@ -1,1 +1,703 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>학습 용어 정리</title>
+    <style>
+        /* 다크모드와 라이트모드를 위한 CSS 변수 설정 */
+        :root {
+            --bg-color: #f4f7f6;
+            --text-color: #333;
+            --card-bg: #fff;
+            --border-color: #ddd;
+            --primary-color: #4a90e2;
+            --primary-hover: #357abd;
+            --danger-color: #e74c3c;
+            --danger-hover: #c0392b;
+            --success-color: #2ecc71;
+            --success-hover: #27ae60;
+            --header-bg: #fff;
+            --shadow: 0 2px 5px rgba(0,0,0,0.1);
+            --input-bg: #fff;
+            --input-text: #333;
+            --star-color: #f1c40f;
+            --star-empty: #ccc;
+        }
 
+        /* 다크모드일 때 적용될 색상들 */
+        [data-theme="dark"] {
+            --bg-color: #1e1e1e;
+            --text-color: #f4f4f4;
+            --card-bg: #2d2d2d;
+            --border-color: #444;
+            --primary-color: #3a7bc8;
+            --primary-hover: #2c5d99;
+            --header-bg: #2d2d2d;
+            --shadow: 0 2px 5px rgba(0,0,0,0.3);
+            --input-bg: #3d3d3d;
+            --input-text: #f4f4f4;
+        }
+
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+
+        body {
+            font-family: 'Malgun Gothic', 'Apple SD Gothic Neo', sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            line-height: 1.6;
+            transition: background-color 0.3s, color 0.3s;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        /* 헤더 스타일 */
+        header {
+            background-color: var(--header-bg);
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: var(--shadow);
+            margin-bottom: 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+
+        .header-actions { display: flex; gap: 10px; }
+
+        /* 공통 버튼 스타일 */
+        button {
+            padding: 8px 12px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 14px;
+            transition: background-color 0.2s;
+            color: white;
+        }
+        
+        .btn-primary { background-color: var(--primary-color); }
+        .btn-primary:hover { background-color: var(--primary-hover); }
+        .btn-danger { background-color: var(--danger-color); }
+        .btn-danger:hover { background-color: var(--danger-hover); }
+        .btn-success { background-color: var(--success-color); }
+        .btn-success:hover { background-color: var(--success-hover); }
+        .btn-secondary { background-color: #7f8c8d; }
+        .btn-secondary:hover { background-color: #95a5a6; }
+
+        /* 컨트롤 영역 (검색창, 버튼들) */
+        .controls {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 15px;
+            margin-bottom: 20px;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .search-box { flex: 1; min-width: 200px; }
+
+        input[type="text"], select, textarea {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid var(--border-color);
+            border-radius: 4px;
+            background-color: var(--input-bg);
+            color: var(--input-text);
+        }
+
+        /* 카테고리 탭 */
+        .categories {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+
+        .category-tab {
+            padding: 8px 16px;
+            background-color: var(--card-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 20px;
+            cursor: pointer;
+            user-select: none;
+        }
+
+        .category-tab.active {
+            background-color: var(--primary-color);
+            color: white;
+            border-color: var(--primary-color);
+        }
+
+        /* 용어 목록 - 카드 뷰 */
+        .term-list.card-view {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 20px;
+        }
+
+        .term-card {
+            background-color: var(--card-bg);
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: var(--shadow);
+        }
+
+        .term-card h3 { margin-bottom: 10px; display: flex; align-items: center; gap: 10px; }
+        .term-card .category-badge {
+            display: inline-block;
+            font-size: 0.8em;
+            padding: 2px 8px;
+            background-color: var(--bg-color);
+            border-radius: 12px;
+            margin-bottom: 10px;
+        }
+        .term-card .definition { margin-bottom: 10px; white-space: pre-wrap; }
+        .term-card .example { font-style: italic; color: #7f8c8d; font-size: 0.9em; margin-bottom: 15px; }
+        .term-card .actions { display: flex; gap: 10px; justify-content: flex-end; }
+        
+        .star { cursor: pointer; font-size: 1.2em; color: var(--star-empty); }
+        .star.active { color: var(--star-color); }
+
+        /* 용어 목록 - 테이블 뷰 */
+        .term-list.table-view {
+            width: 100%;
+            overflow-x: auto;
+            background-color: var(--card-bg);
+            border-radius: 8px;
+            box-shadow: var(--shadow);
+        }
+
+        table { width: 100%; border-collapse: collapse; }
+        th, td { padding: 12px 15px; text-align: left; border-bottom: 1px solid var(--border-color); }
+        th { background-color: var(--bg-color); font-weight: bold; }
+        .table-view .actions { display: flex; gap: 5px; }
+
+        /* 모달 (팝업창) 스타일 */
+        .modal-overlay {
+            display: none;
+            position: fixed;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background: rgba(0,0,0,0.5);
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+        }
+
+        .modal-overlay.active { display: flex; }
+
+        .modal-content {
+            background-color: var(--card-bg);
+            padding: 25px;
+            border-radius: 8px;
+            width: 90%;
+            max-width: 500px;
+            max-height: 90vh;
+            overflow-y: auto;
+        }
+
+        .modal-content h2 { margin-bottom: 20px; }
+        .form-group { margin-bottom: 15px; }
+        .form-group label { display: block; margin-bottom: 5px; font-weight: bold; }
+        .modal-actions { display: flex; justify-content: flex-end; gap: 10px; margin-top: 20px; }
+
+        /* 카테고리 관리 리스트 */
+        .cat-manage-list { list-style: none; margin-top: 15px; }
+        .cat-manage-item { 
+            display: flex; justify-content: space-between; align-items: center; 
+            padding: 10px; border-bottom: 1px solid var(--border-color);
+        }
+        .cat-manage-item input { width: auto; flex: 1; margin-right: 10px; }
+
+        /* 모바일 반응형 처리 */
+        @media (max-width: 600px) {
+            .controls { flex-direction: column; align-items: stretch; }
+            .header-actions { justify-content: space-between; width: 100%; }
+            .controls > div:last-child { display: flex; flex-direction: column; }
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <header>
+        <h1>학습 용어 정리</h1>
+        <div class="header-actions">
+            <button class="btn-secondary" onclick="toggleDarkMode()">🌙 다크 모드</button>
+            <button class="btn-secondary" onclick="exportData()">⬇️ 내보내기</button>
+            <button class="btn-secondary" onclick="document.getElementById('importFile').click()">⬆️ 가져오기</button>
+            <!-- 파일 선택 창은 숨겨두고 버튼 클릭으로 연결합니다 -->
+            <input type="file" id="importFile" style="display:none" accept=".json" onchange="importData(event)">
+        </div>
+    </header>
+
+    <!-- 카테고리 탭 영역 -->
+    <div class="categories" id="categoryTabs"></div>
+
+    <!-- 검색 및 조작 버튼 영역 -->
+    <div class="controls">
+        <div class="search-box">
+            <input type="text" id="searchInput" placeholder="용어명 또는 뜻 검색..." oninput="handleSearch()">
+        </div>
+        <div style="display: flex; gap: 10px;">
+            <button class="btn-primary" onclick="toggleView()">카드/표 전환</button>
+            <button class="btn-success" onclick="openCategoryModal()">카테고리 관리</button>
+            <button class="btn-primary" onclick="openTermModal()">+ 용어 추가</button>
+        </div>
+    </div>
+
+    <!-- 용어 목록이 표시될 메인 영역 -->
+    <main id="content">
+        <div id="termList" class="term-list card-view"></div>
+    </main>
+</div>
+
+<!-- 용어 추가/수정 모달 -->
+<div class="modal-overlay" id="termModal">
+    <div class="modal-content">
+        <h2 id="termModalTitle">용어 추가</h2>
+        <input type="hidden" id="termId">
+        <div class="form-group">
+            <label for="termName">용어명</label>
+            <input type="text" id="termName" required>
+        </div>
+        <div class="form-group">
+            <label for="termCategory">카테고리</label>
+            <select id="termCategory"></select>
+        </div>
+        <div class="form-group">
+            <label for="termDefinition">뜻 (설명)</label>
+            <textarea id="termDefinition" rows="4" required></textarea>
+        </div>
+        <div class="form-group">
+            <label for="termExample">예시 문장 (선택)</label>
+            <textarea id="termExample" rows="2"></textarea>
+        </div>
+        <div class="form-group" style="display: flex; align-items: center; gap: 10px;">
+            <label for="termImportant" style="margin: 0;">중요 (별표)</label>
+            <input type="checkbox" id="termImportant" style="width: auto;">
+        </div>
+        <div class="modal-actions">
+            <button class="btn-secondary" onclick="closeModal('termModal')">취소</button>
+            <button class="btn-primary" onclick="saveTerm()">저장</button>
+        </div>
+    </div>
+</div>
+
+<!-- 카테고리 관리 모달 -->
+<div class="modal-overlay" id="categoryModal">
+    <div class="modal-content">
+        <h2>카테고리 관리</h2>
+        <div class="form-group" style="display: flex; gap: 10px;">
+            <input type="text" id="newCategoryName" placeholder="새 카테고리명">
+            <button class="btn-primary" onclick="addCategory()">추가</button>
+        </div>
+        <ul class="cat-manage-list" id="categoryManageList"></ul>
+        <div class="modal-actions">
+            <button class="btn-secondary" onclick="closeModal('categoryModal')">닫기</button>
+        </div>
+    </div>
+</div>
+
+<script>
+    // 1. 상태 관리 (데이터 저장소 역할)
+    let state = {
+        categories: [],
+        terms: [],
+        currentView: 'card', // 'card' 또는 'table'
+        activeCategory: 'all',
+        searchQuery: '',
+        isDarkMode: false
+    };
+
+    // 초기 샘플 데이터
+    const defaultCategories = [
+        { id: 'cat_1', name: '프로그래밍 기초' },
+        { id: 'cat_2', name: '웹 개발' }
+    ];
+
+    const defaultTerms = [
+        { id: 'term_1', name: 'HTML', definition: '웹 페이지의 구조를 정의하는 마크업 언어입니다.', categoryId: 'cat_2', isImportant: true, example: '<!DOCTYPE html>\n<html>...</html>' },
+        { id: 'term_2', name: '변수 (Variable)', definition: '데이터를 저장하기 위해 할당받은 메모리 공간입니다.', categoryId: 'cat_1', isImportant: false, example: 'let age = 20;' },
+        { id: 'term_3', name: 'CSS', definition: 'HTML 문서의 스타일을 꾸며주는 스타일시트 언어입니다.', categoryId: 'cat_2', isImportant: true, example: 'body { background-color: #fff; }' }
+    ];
+
+    // 2. 초기화 함수 (페이지 로드 시 실행)
+    function init() {
+        loadData();
+        applyDarkMode();
+        renderCategories();
+        renderTerms();
+    }
+
+    // 로컬 스토리지에서 데이터 불러오기
+    function loadData() {
+        const savedData = localStorage.getItem('termDictionaryData');
+        if (savedData) {
+            const parsed = JSON.parse(savedData);
+            state.categories = parsed.categories || defaultCategories;
+            state.terms = parsed.terms || defaultTerms;
+            state.currentView = parsed.currentView || 'card';
+            state.isDarkMode = parsed.isDarkMode || false;
+        } else {
+            state.categories = [...defaultCategories];
+            state.terms = [...defaultTerms];
+        }
+    }
+
+    // 로컬 스토리지에 데이터 저장하기
+    function saveData() {
+        localStorage.setItem('termDictionaryData', JSON.stringify({
+            categories: state.categories,
+            terms: state.terms,
+            currentView: state.currentView,
+            isDarkMode: state.isDarkMode
+        }));
+    }
+
+    // 3. 화면 그리기 (렌더링) 함수들
+    function renderCategories() {
+        const container = document.getElementById('categoryTabs');
+        container.innerHTML = `<div class="category-tab ${state.activeCategory === 'all' ? 'active' : ''}" onclick="setCategory('all')">전체</div>`;
+        
+        state.categories.forEach(cat => {
+            container.innerHTML += `<div class="category-tab ${state.activeCategory === cat.id ? 'active' : ''}" onclick="setCategory('${cat.id}')">${escapeHTML(cat.name)}</div>`;
+        });
+    }
+
+    function renderTerms() {
+        const container = document.getElementById('termList');
+        container.className = `term-list ${state.currentView}-view`;
+        container.innerHTML = '';
+
+        // 카테고리와 검색어로 필터링
+        let filteredTerms = state.terms.filter(term => {
+            const matchCategory = state.activeCategory === 'all' || term.categoryId === state.activeCategory;
+            const query = state.searchQuery.toLowerCase();
+            const matchSearch = term.name.toLowerCase().includes(query) || term.definition.toLowerCase().includes(query);
+            return matchCategory && matchSearch;
+        });
+
+        if (filteredTerms.length === 0) {
+            container.innerHTML = '<p style="padding: 20px; text-align: center; width: 100%;">조건에 맞는 용어가 없습니다.</p>';
+            return;
+        }
+
+        // 카드 뷰 렌더링
+        if (state.currentView === 'card') {
+            filteredTerms.forEach(term => {
+                const catName = getCategoryName(term.categoryId);
+                container.innerHTML += `
+                    <div class="term-card">
+                        <h3>
+                            <span class="star ${term.isImportant ? 'active' : ''}" onclick="toggleImportant('${term.id}')">★</span>
+                            ${escapeHTML(term.name)}
+                        </h3>
+                        <div class="category-badge">${escapeHTML(catName)}</div>
+                        <div class="definition">${escapeHTML(term.definition)}</div>
+                        ${term.example ? `<div class="example">예시: ${escapeHTML(term.example)}</div>` : ''}
+                        <div class="actions">
+                            <button class="btn-primary" onclick="openTermModal('${term.id}')">수정</button>
+                            <button class="btn-danger" onclick="deleteTerm('${term.id}')">삭제</button>
+                        </div>
+                    </div>
+                `;
+            });
+        } 
+        // 테이블 뷰 렌더링
+        else {
+            let tableHTML = `
+                <table>
+                    <thead>
+                        <tr>
+                            <th style="width: 50px;">중요</th>
+                            <th style="width: 150px;">용어명</th>
+                            <th style="width: 120px;">카테고리</th>
+                            <th>뜻 (설명)</th>
+                            <th style="width: 120px;">관리</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+            `;
+            filteredTerms.forEach(term => {
+                const catName = getCategoryName(term.categoryId);
+                tableHTML += `
+                    <tr>
+                        <td style="text-align: center;">
+                            <span class="star ${term.isImportant ? 'active' : ''}" onclick="toggleImportant('${term.id}')">★</span>
+                        </td>
+                        <td><strong>${escapeHTML(term.name)}</strong></td>
+                        <td>${escapeHTML(catName)}</td>
+                        <td>
+                            <div>${escapeHTML(term.definition)}</div>
+                            ${term.example ? `<div class="example" style="margin-top:5px;">예시: ${escapeHTML(term.example)}</div>` : ''}
+                        </td>
+                        <td>
+                            <div class="actions">
+                                <button class="btn-primary" onclick="openTermModal('${term.id}')">수정</button>
+                                <button class="btn-danger" onclick="deleteTerm('${term.id}')">삭제</button>
+                            </div>
+                        </td>
+                    </tr>
+                `;
+            });
+            tableHTML += `</tbody></table>`;
+            container.innerHTML = tableHTML;
+        }
+    }
+
+    // 4. 이벤트 핸들러 (사용자 동작 처리)
+    function setCategory(id) {
+        state.activeCategory = id;
+        renderCategories();
+        renderTerms();
+    }
+
+    function handleSearch() {
+        state.searchQuery = document.getElementById('searchInput').value;
+        renderTerms();
+    }
+
+    function toggleView() {
+        state.currentView = state.currentView === 'card' ? 'table' : 'card';
+        saveData();
+        renderTerms();
+    }
+
+    function toggleDarkMode() {
+        state.isDarkMode = !state.isDarkMode;
+        applyDarkMode();
+        saveData();
+    }
+
+    function applyDarkMode() {
+        if (state.isDarkMode) {
+            document.body.setAttribute('data-theme', 'dark');
+        } else {
+            document.body.removeAttribute('data-theme');
+        }
+    }
+
+    function toggleImportant(id) {
+        const term = state.terms.find(t => t.id === id);
+        if (term) {
+            term.isImportant = !term.isImportant;
+            saveData();
+            renderTerms();
+        }
+    }
+
+    // 5. 용어 관리 로직
+    function openTermModal(id = null) {
+        const modal = document.getElementById('termModal');
+        const title = document.getElementById('termModalTitle');
+        const idInput = document.getElementById('termId');
+        const nameInput = document.getElementById('termName');
+        const catSelect = document.getElementById('termCategory');
+        const defInput = document.getElementById('termDefinition');
+        const exInput = document.getElementById('termExample');
+        const impInput = document.getElementById('termImportant');
+
+        // 카테고리 선택 옵션 채우기
+        catSelect.innerHTML = state.categories.map(c => `<option value="${c.id}">${escapeHTML(c.name)}</option>`).join('');
+        if (state.categories.length === 0) catSelect.innerHTML = `<option value="">카테고리 없음</option>`;
+
+        if (id) {
+            // 수정 모드
+            const term = state.terms.find(t => t.id === id);
+            title.textContent = '용어 수정';
+            idInput.value = term.id;
+            nameInput.value = term.name;
+            catSelect.value = term.categoryId;
+            defInput.value = term.definition;
+            exInput.value = term.example || '';
+            impInput.checked = term.isImportant;
+        } else {
+            // 추가 모드
+            title.textContent = '용어 추가';
+            idInput.value = '';
+            nameInput.value = '';
+            catSelect.value = state.activeCategory !== 'all' ? state.activeCategory : (state.categories[0]?.id || '');
+            defInput.value = '';
+            exInput.value = '';
+            impInput.checked = false;
+        }
+        modal.classList.add('active');
+    }
+
+    function saveTerm() {
+        const id = document.getElementById('termId').value;
+        const name = document.getElementById('termName').value.trim();
+        const categoryId = document.getElementById('termCategory').value;
+        const definition = document.getElementById('termDefinition').value.trim();
+        const example = document.getElementById('termExample').value.trim();
+        const isImportant = document.getElementById('termImportant').checked;
+
+        if (!name || !definition) {
+            alert('용어명과 뜻을 입력해주세요.');
+            return;
+        }
+
+        if (id) {
+            const index = state.terms.findIndex(t => t.id === id);
+            if (index !== -1) state.terms[index] = { id, name, categoryId, definition, example, isImportant };
+        } else {
+            const newId = 'term_' + Date.now();
+            state.terms.push({ id: newId, name, categoryId, definition, example, isImportant });
+        }
+
+        saveData();
+        renderTerms();
+        closeModal('termModal');
+    }
+
+    function deleteTerm(id) {
+        if (confirm('정말 이 용어를 삭제하시겠습니까?')) {
+            state.terms = state.terms.filter(t => t.id !== id);
+            saveData();
+            renderTerms();
+        }
+    }
+
+    // 6. 카테고리 관리 로직
+    function openCategoryModal() {
+        renderCategoryManageList();
+        document.getElementById('categoryModal').classList.add('active');
+    }
+
+    function renderCategoryManageList() {
+        const list = document.getElementById('categoryManageList');
+        list.innerHTML = state.categories.map(cat => `
+            <li class="cat-manage-item">
+                <input type="text" value="${escapeHTML(cat.name)}" id="cat_input_${cat.id}">
+                <div class="actions">
+                    <button class="btn-primary" onclick="updateCategory('${cat.id}')">수정</button>
+                    <button class="btn-danger" onclick="deleteCategory('${cat.id}')">삭제</button>
+                </div>
+            </li>
+        `).join('');
+    }
+
+    function addCategory() {
+        const input = document.getElementById('newCategoryName');
+        const name = input.value.trim();
+        if (!name) return;
+
+        const newId = 'cat_' + Date.now();
+        state.categories.push({ id: newId, name });
+        input.value = '';
+        
+        saveData();
+        renderCategories();
+        renderCategoryManageList();
+    }
+
+    function updateCategory(id) {
+        const input = document.getElementById(`cat_input_${id}`);
+        const newName = input.value.trim();
+        if (!newName) {
+            alert('카테고리명을 입력하세요.');
+            return;
+        }
+
+        const cat = state.categories.find(c => c.id === id);
+        if (cat) {
+            cat.name = newName;
+            saveData();
+            renderCategories();
+            renderTerms(); 
+            alert('수정되었습니다.');
+        }
+    }
+
+    function deleteCategory(id) {
+        if (confirm('이 카테고리를 삭제하시겠습니까?\n속해있는 용어들은 "미분류" 상태가 됩니다.')) {
+            state.categories = state.categories.filter(c => c.id !== id);
+            state.terms.forEach(t => { if (t.categoryId === id) t.categoryId = ''; });
+            if (state.activeCategory === id) state.activeCategory = 'all';
+            
+            saveData();
+            renderCategories();
+            renderTerms();
+            renderCategoryManageList();
+        }
+    }
+
+    // 7. 유틸리티 및 부가 기능
+    function closeModal(modalId) {
+        document.getElementById(modalId).classList.remove('active');
+    }
+
+    function getCategoryName(id) {
+        const cat = state.categories.find(c => c.id === id);
+        return cat ? cat.name : '미분류';
+    }
+
+    // XSS 방지를 위한 HTML 이스케이프 함수
+    function escapeHTML(str) {
+        if (!str) return '';
+        return str.replace(/[&<>'"]/g, 
+            tag => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', "'": '&#39;', '"': '&quot;' }[tag])
+        );
+    }
+
+    // 데이터 내보내기 (JSON 다운로드)
+    function exportData() {
+        const dataStr = JSON.stringify({ categories: state.categories, terms: state.terms }, null, 2);
+        const blob = new Blob([dataStr], { type: 'application/json' });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = 'term_dictionary_backup.json';
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        URL.revokeObjectURL(url);
+    }
+
+    // 데이터 가져오기 (JSON 업로드)
+    function importData(event) {
+        const file = event.target.files[0];
+        if (!file) return;
+
+        const reader = new FileReader();
+        reader.onload = function(e) {
+            try {
+                const parsed = JSON.parse(e.target.result);
+                if (parsed.categories && parsed.terms) {
+                    state.categories = parsed.categories;
+                    state.terms = parsed.terms;
+                    saveData();
+                    renderCategories();
+                    renderTerms();
+                    alert('데이터를 성공적으로 불러왔습니다.');
+                } else {
+                    alert('올바른 백업 파일 형식이 아닙니다.');
+                }
+            } catch (err) {
+                alert('파일을 읽는 중 오류가 발생했습니다.');
+            }
+            event.target.value = ''; // 같은 파일을 다시 선택할 수 있도록 초기화
+        };
+        reader.readAsText(file);
+    }
+
+    // 모달 바깥 영역 클릭 시 닫기
+    window.onclick = function(event) {
+        if (event.target.classList.contains('modal-overlay')) {
+            event.target.classList.remove('active');
+        }
+    }
+
+    // 스크립트 로드 완료 시 초기화 함수 실행
+    window.onload = init;
+
+</script>
+</body>
+</html>
