@@ -1,0 +1,317 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>학습 용어 정리</title>
+<style>
+  /* ===== 다크 모드용 CSS 변수 ===== */
+  :root {
+    --bg: #f5f6fa;
+    --surface: #ffffff;
+    --text: #222;
+    --muted: #666;
+    --border: #e0e0e0;
+    --primary: #4a7cf0;
+    --primary-hover: #3a66cc;
+    --danger: #e74c3c;
+    --tab-bg: #ececec;
+    --star: #f4b400;
+  }
+  body.dark {
+    --bg: #1e1f24;
+    --surface: #2a2c33;
+    --text: #f0f0f0;
+    --muted: #aaa;
+    --border: #3a3c44;
+    --primary: #6b92f5;
+    --primary-hover: #8aa8f7;
+    --danger: #ff6b5b;
+    --tab-bg: #3a3c44;
+    --star: #f4c430;
+  }
+
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    font-family: 'Malgun Gothic', 'Apple SD Gothic Neo', sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    line-height: 1.5;
+  }
+  .wrap { max-width: 1000px; margin: 0 auto; padding: 16px; }
+
+  /* ===== 헤더 ===== */
+  header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 16px;
+    flex-wrap: wrap;
+    gap: 8px;
+  }
+  header h1 { margin: 0; font-size: 1.6rem; }
+
+  /* ===== 버튼 공통 ===== */
+  button {
+    cursor: pointer;
+    padding: 8px 14px;
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    background: var(--surface);
+    color: var(--text);
+    font-size: 0.95rem;
+  }
+  button:hover { background: var(--tab-bg); }
+  button.primary {
+    background: var(--primary); color: #fff; border-color: var(--primary);
+  }
+  button.primary:hover { background: var(--primary-hover); }
+  button.danger {
+    background: var(--danger); color: #fff; border-color: var(--danger);
+  }
+
+  /* ===== 상단 컨트롤 ===== */
+  .controls {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin-bottom: 12px;
+  }
+  .controls input[type="text"] {
+    flex: 1;
+    min-width: 200px;
+    padding: 8px 12px;
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    background: var(--surface);
+    color: var(--text);
+    font-size: 0.95rem;
+  }
+
+  /* ===== 카테고리 탭 ===== */
+  .tabs {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+    margin-bottom: 16px;
+  }
+  .tab {
+    padding: 6px 12px;
+    border-radius: 20px;
+    background: var(--tab-bg);
+    cursor: pointer;
+    font-size: 0.9rem;
+    user-select: none;
+  }
+  .tab.active {
+    background: var(--primary);
+    color: #fff;
+  }
+
+  /* ===== 입력 폼 (기획서에 "입력 폼이 열린다"고 명시) ===== */
+  .form-panel {
+    display: none;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 16px;
+    margin-bottom: 16px;
+  }
+  .form-panel.open { display: block; }
+  .form-panel h2 { margin: 0 0 12px; font-size: 1.1rem; }
+  .form-row { margin-bottom: 10px; }
+  .form-row label {
+    display: block;
+    margin-bottom: 4px;
+    font-size: 0.9rem;
+    color: var(--muted);
+  }
+  .form-row input[type="text"],
+  .form-row textarea {
+    width: 100%;
+    padding: 8px;
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    background: var(--bg);
+    color: var(--text);
+    font-size: 0.95rem;
+    font-family: inherit;
+  }
+  .form-row textarea { resize: vertical; min-height: 60px; }
+  .form-row.check {
+    display: flex; align-items: center; gap: 6px;
+  }
+  .form-actions {
+    display: flex; gap: 8px; justify-content: flex-end;
+  }
+
+  /* ===== 카드 보기 ===== */
+  .cards {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+    gap: 12px;
+  }
+  .card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 14px;
+    display: flex;
+    flex-direction: column;
+  }
+  .card-top {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    margin-bottom: 8px;
+    gap: 8px;
+  }
+  .card-term {
+    font-weight: bold;
+    font-size: 1.1rem;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+  .star { color: #ccc; font-size: 1.1rem; }
+  .star.on { color: var(--star); }
+  .badge {
+    font-size: 0.8rem;
+    padding: 2px 8px;
+    background: var(--tab-bg);
+    border-radius: 10px;
+    white-space: nowrap;
+  }
+  .card-def {
+    color: var(--text);
+    margin-bottom: 8px;
+    white-space: pre-wrap;
+    word-break: break-word;
+  }
+  .card-ex {
+    font-size: 0.9rem;
+    color: var(--muted);
+    background: var(--bg);
+    padding: 6px 8px;
+    border-left: 3px solid var(--primary);
+    border-radius: 4px;
+    margin-bottom: 10px;
+    white-space: pre-wrap;
+    word-break: break-word;
+  }
+  .card-actions {
+    display: flex; gap: 6px; margin-top: auto;
+    justify-content: flex-end;
+  }
+  .card-actions button { padding: 4px 10px; font-size: 0.85rem; }
+
+  /* ===== 표 보기 ===== */
+  .table-wrap { overflow-x: auto; }
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    overflow: hidden;
+  }
+  th, td {
+    padding: 10px;
+    text-align: left;
+    border-bottom: 1px solid var(--border);
+    vertical-align: top;
+  }
+  th { background: var(--tab-bg); font-weight: bold; font-size: 0.9rem; }
+  tr:last-child td { border-bottom: none; }
+  td.actions { white-space: nowrap; }
+  td.actions button { padding: 4px 8px; font-size: 0.8rem; margin-right: 4px; }
+
+  /* 빈 상태 */
+  .empty {
+    text-align: center;
+    padding: 30px;
+    color: var(--muted);
+  }
+
+  /* ===== 모바일 반응형 ===== */
+  @media (max-width: 500px) {
+    header h1 { font-size: 1.3rem; }
+    .controls input[type="text"] { min-width: 100%; }
+    button { flex: 1 1 auto; }
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <!-- 헤더: 페이지 제목 -->
+  <header>
+    <h1>학습 용어 정리</h1>
+    <button id="btnDark" type="button">🌙 다크 모드</button>
+  </header>
+
+  <!-- 상단 컨트롤: 검색창 + 전환/추가/백업 버튼 -->
+  <div class="controls">
+    <input type="text" id="searchInput" placeholder="용어명 또는 뜻으로 검색">
+    <button id="btnView" type="button">표 보기로 전환</button>
+    <button id="btnAdd" class="primary" type="button">+ 용어 추가</button>
+    <button id="btnExport" type="button">내보내기</button>
+    <button id="btnImport" type="button">가져오기</button>
+    <input type="file" id="fileInput" accept=".json" hidden>
+  </div>
+
+  <!-- 카테고리 탭 -->
+  <div class="tabs" id="tabs"></div>
+
+  <!-- 입력 폼 (추가/수정 공용) -->
+  <div class="form-panel" id="formPanel">
+    <h2 id="formTitle">새 용어 추가</h2>
+    <form id="termForm">
+      <input type="hidden" id="editId">
+      <div class="form-row">
+        <label for="inputTerm">용어명 *</label>
+        <input type="text" id="inputTerm" required>
+      </div>
+      <div class="form-row">
+        <label for="inputCategory">카테고리 *</label>
+        <input type="text" id="inputCategory" placeholder="예: 프로그래밍, 수학" required>
+      </div>
+      <div class="form-row">
+        <label for="inputDef">뜻(설명) *</label>
+        <textarea id="inputDef" required></textarea>
+      </div>
+      <div class="form-row">
+        <label for="inputExample">예시 문장 (선택)</label>
+        <textarea id="inputExample"></textarea>
+      </div>
+      <div class="form-row check">
+        <input type="checkbox" id="inputImportant">
+        <label for="inputImportant" style="margin:0;">중요 표시 (별표)</label>
+      </div>
+      <div class="form-actions">
+        <button type="button" id="btnCancel">취소</button>
+        <button type="submit" class="primary">저장</button>
+      </div>
+    </form>
+  </div>
+
+  <!-- 용어 목록 표시 영역 -->
+  <div id="list"></div>
+
+</div>
+
+<script>
+/* ============================================
+   1. 상태 변수 및 초기 샘플 데이터
+   ============================================ */
+const STORAGE_KEY = 'studyTerms';
+const DARK_KEY = 'studyTermsDark';
+
+const sampleTerms = [
+  { id: '1', term: 'HTML',
+    definition: '웹 페이지의 구조를 정의하는 마크업 언어입니다.',
+    category: '웹 개발', important: true,
+    example: '<h1>제목</h1>' },
+  { id: '2', term: 'CSS',
+    definition: '웹 페이지의 스타일(색상, 배치 등)을 지정하는 
