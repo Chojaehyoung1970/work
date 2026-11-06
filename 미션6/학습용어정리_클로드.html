@@ -1,3 +1,14 @@
+안녕하세요! 기획서에 명시된 기능만 담아서 HTML 파일 하나로 완성해 드리겠습니다. 이전 답변이 중간에 끊긴 점 죄송합니다. 이번에는 처음부터 끝까지 완전한 코드를 한 번에 제공하겠습니다.
+
+> 📌 **참고:** AI 모델명으로 적으신 "Claude Opus 4.8"은 실제로 존재하는 모델명이 아닐 수 있습니다. 실제 사용하신 모델명을 확인해서 정확히 기재하시는 것을 권장드립니다.
+
+---
+
+### 📄 완성 코드
+
+아래 코드를 복사해 `용어정리.html` 같은 이름으로 저장한 뒤, 더블클릭으로 브라우저에서 열면 됩니다.
+
+```html
 <!DOCTYPE html>
 <html lang="ko">
 <head>
@@ -109,7 +120,7 @@
     color: #fff;
   }
 
-  /* ===== 입력 폼 (기획서에 "입력 폼이 열린다"고 명시) ===== */
+  /* ===== 입력 폼 ===== */
   .form-panel {
     display: none;
     background: var(--surface);
@@ -174,7 +185,12 @@
     align-items: center;
     gap: 6px;
   }
-  .star { color: #ccc; font-size: 1.1rem; }
+  .star {
+    color: #ccc;
+    font-size: 1.1rem;
+    cursor: pointer;
+    user-select: none;
+  }
   .star.on { color: var(--star); }
   .badge {
     font-size: 0.8rem;
@@ -238,7 +254,6 @@
   @media (max-width: 500px) {
     header h1 { font-size: 1.3rem; }
     .controls input[type="text"] { min-width: 100%; }
-    button { flex: 1 1 auto; }
   }
 </style>
 </head>
@@ -303,7 +318,7 @@
 
 <script>
 /* ============================================
-   1. 상태 변수 및 초기 샘플 데이터
+   1. 저장소 키와 초기 샘플 데이터
    ============================================ */
 const STORAGE_KEY = 'studyTerms';
 const DARK_KEY = 'studyTermsDark';
@@ -314,4 +329,8 @@ const sampleTerms = [
     category: '웹 개발', important: true,
     example: '<h1>제목</h1>' },
   { id: '2', term: 'CSS',
-    definition: '웹 페이지의 스타일(색상, 배치 등)을 지정하는 
+    definition: '웹 페이지의 스타일(색상, 배치 등)을 지정하는 언어입니다.',
+    category: '웹 개발', important: false,
+    example: 'body { color: red; }' },
+  { id: '3', term: '변수',
+    definition: '값을 담아두는 이름 붙은 저장 공간입
