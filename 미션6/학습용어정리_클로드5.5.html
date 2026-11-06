@@ -1,0 +1,300 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>학습 용어 정리</title>
+<style>
+:root{
+  --bg:#f3f5f9;--surface:#fff;--ink:#16202e;--muted:#5b6675;--line:#d9dfe8;
+  --accent:#2a4fd6;--accent-ink:#fff;--accent-soft:#e6ecff;--star:#e0a100;--danger:#c0362c;
+  --radius:10px;
+}
+:root[data-theme="dark"]{
+  --bg:#12161d;--surface:#1b212b;--ink:#e8ecf3;--muted:#9aa5b6;--line:#2d3644;
+  --accent:#7d9bff;--accent-ink:#0f1626;--accent-soft:#25304d;--star:#f2c04a;--danger:#ff8a80;
+}
+*{box-sizing:border-box}
+html{color-scheme:light}
+:root[data-theme="dark"]{color-scheme:dark}
+body{margin:0;background:var(--bg);color:var(--ink);
+  font-family:"Pretendard","Noto Sans KR","Apple SD Gothic Neo","Malgun Gothic",system-ui,sans-serif;
+  line-height:1.6;font-size:16px}
+button,input,textarea{font:inherit;color:inherit}
+button{cursor:pointer}
+:focus-visible{outline:3px solid var(--accent);outline-offset:2px}
+.wrap{max-width:1040px;margin:0 auto;padding:0 16px 48px}
+header{display:flex;justify-content:space-between;align-items:center;gap:12px;padding:24px 0 16px}
+h1{margin:0;font-size:1.6rem;letter-spacing:-.02em}
+.btn{border:1px solid var(--line);background:var(--surface);border-radius:8px;padding:8px 14px;min-height:40px}
+.btn:hover{border-color:var(--accent)}
+.btn.primary{background:var(--accent);color:var(--accent-ink);border-color:var(--accent);font-weight:600}
+.btn.danger{color:var(--danger)}
+.btn.small{padding:4px 10px;min-height:32px;font-size:.9rem}
+.tools{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:12px}
+.tools input[type=search]{flex:1 1 240px;min-height:40px;padding:8px 12px;border:1px solid var(--line);
+  border-radius:8px;background:var(--surface)}
+.tabs{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:16px}
+.tab{border:1px solid var(--line);background:var(--surface);border-radius:999px;padding:4px 14px;min-height:34px}
+.tab[aria-pressed="true"]{background:var(--accent);color:var(--accent-ink);border-color:var(--accent)}
+.count{color:var(--muted);font-size:.9rem;margin:0 0 10px}
+.cards{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:12px}
+.card{background:var(--surface);border:1px solid var(--line);border-radius:var(--radius);padding:16px;
+  display:flex;flex-direction:column;gap:8px}
+.card h2{margin:0;font-size:1.15rem;display:flex;gap:6px;align-items:baseline}
+.star{color:var(--star)}
+.meaning{margin:0}
+.example{margin:0;color:var(--muted);font-size:.92rem;padding-left:10px;border-left:3px solid var(--accent-soft)}
+.badge{align-self:flex-start;background:var(--accent-soft);color:var(--accent);border-radius:6px;padding:1px 8px;font-size:.85rem}
+.actions{display:flex;gap:6px;margin-top:auto}
+.table-wrap{overflow-x:auto;background:var(--surface);border:1px solid var(--line);border-radius:var(--radius)}
+table{border-collapse:collapse;width:100%;min-width:720px}
+th,td{text-align:left;padding:10px 12px;border-bottom:1px solid var(--line);vertical-align:top}
+th{background:var(--accent-soft);font-weight:600;white-space:nowrap}
+tr:last-child td{border-bottom:0}
+td.act{white-space:nowrap}
+td.act .btn+.btn{margin-left:4px}
+.empty{padding:40px 16px;text-align:center;color:var(--muted);background:var(--surface);
+  border:1px dashed var(--line);border-radius:var(--radius)}
+dialog{border:1px solid var(--line);border-radius:12px;background:var(--surface);color:var(--ink);
+  width:min(480px,calc(100vw - 24px));padding:20px}
+dialog::backdrop{background:rgba(0,0,0,.45)}
+dialog h2{margin:0 0 12px;font-size:1.2rem}
+label{display:block;margin-bottom:12px;font-weight:600;font-size:.95rem}
+label input[type=text],label textarea{display:block;width:100%;margin-top:4px;padding:8px 10px;
+  border:1px solid var(--line);border-radius:8px;background:var(--bg);font-weight:400}
+label.check{display:flex;gap:8px;align-items:center}
+.row{display:flex;justify-content:flex-end;gap:8px;margin-top:8px}
+@media (max-width:520px){
+  h1{font-size:1.3rem}
+  .tools .btn{flex:1 1 auto}
+}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <h1>학습 용어 정리</h1>
+    <button class="btn" id="themeBtn" type="button" aria-pressed="false">다크 모드</button>
+  </header>
+
+  <div class="tools">
+    <input type="search" id="search" placeholder="용어명이나 뜻으로 검색" aria-label="용어 검색">
+    <button class="btn" id="viewBtn" type="button">표로 보기</button>
+    <button class="btn primary" id="addBtn" type="button">용어 추가</button>
+    <button class="btn" id="exportBtn" type="button">내보내기</button>
+    <button class="btn" id="importBtn" type="button">가져오기</button>
+    <input type="file" id="importFile" accept=".json,application/json" hidden>
+  </div>
+
+  <div class="tabs" id="tabs" role="group" aria-label="카테고리"></div>
+  <p class="count" id="count" aria-live="polite"></p>
+  <div id="list"></div>
+</div>
+
+<dialog id="dlg">
+  <form id="form">
+    <h2 id="dlgTitle">용어 추가</h2>
+    <label>용어명
+      <input type="text" id="fName" required maxlength="80" autocomplete="off">
+    </label>
+    <label>뜻
+      <textarea id="fMeaning" rows="3" required></textarea>
+    </label>
+    <label>카테고리
+      <input type="text" id="fCat" required maxlength="30" list="catList" autocomplete="off">
+      <datalist id="catList"></datalist>
+    </label>
+    <label>예시 문장 (선택)
+      <textarea id="fExample" rows="2"></textarea>
+    </label>
+    <label class="check"><input type="checkbox" id="fStar"> 중요 용어로 표시 (★)</label>
+    <div class="row">
+      <button class="btn" type="button" id="cancelBtn">취소</button>
+      <button class="btn primary" type="submit">저장</button>
+    </div>
+  </form>
+</dialog>
+
+<script>
+(function(){
+  var KEY_DATA='glossary.terms', KEY_VIEW='glossary.view', KEY_THEME='glossary.theme';
+  var SAMPLE=[
+    {id:'s1',name:'HTML',meaning:'웹 페이지의 구조와 내용을 표시하는 마크업 언어.',category:'웹 기본',example:'HTML로 제목과 문단을 만든다.',star:true},
+    {id:'s2',name:'CSS',meaning:'웹 페이지의 색상, 글꼴, 배치 같은 모양을 꾸미는 스타일 언어.',category:'웹 기본',example:'CSS로 버튼의 배경색을 바꾼다.',star:false},
+    {id:'s3',name:'변수',meaning:'값을 저장해 두고 이름으로 불러 쓰는 공간.',category:'프로그래밍',example:'점수를 변수에 저장한 뒤 계속 더한다.',star:true},
+    {id:'s4',name:'반응형 웹',meaning:'화면 크기에 맞춰 레이아웃이 자동으로 바뀌는 웹 디자인 방식.',category:'웹 디자인',example:'반응형 웹은 PC와 모바일에서 모두 보기 좋다.',star:false}
+  ];
+
+  function load(k){try{return localStorage.getItem(k)}catch(e){return null}}
+  function save(k,v){try{localStorage.setItem(k,v)}catch(e){}}
+
+  var terms;
+  try{terms=JSON.parse(load(KEY_DATA))}catch(e){terms=null}
+  if(!Array.isArray(terms)) terms=SAMPLE.slice();
+  var view=load(KEY_VIEW)==='table'?'table':'card';
+  var cat='전체', query='', editingId=null;
+
+  var $=function(id){return document.getElementById(id)};
+  var listEl=$('list'), tabsEl=$('tabs'), countEl=$('count'), dlg=$('dlg');
+
+  function esc(s){return String(s).replace(/[&<>"']/g,function(c){
+    return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]})}
+  function persist(){save(KEY_DATA,JSON.stringify(terms))}
+  function categories(){
+    var out=[];terms.forEach(function(t){if(out.indexOf(t.category)<0)out.push(t.category)});return out;
+  }
+
+  /* 테마 */
+  function applyTheme(t){
+    document.documentElement.setAttribute('data-theme',t);
+    var on=t==='dark';
+    $('themeBtn').setAttribute('aria-pressed',on);
+    $('themeBtn').textContent=on?'라이트 모드':'다크 모드';
+  }
+  var savedTheme=load(KEY_THEME);
+  applyTheme(savedTheme||(window.matchMedia&&matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light'));
+  $('themeBtn').onclick=function(){
+    var next=document.documentElement.getAttribute('data-theme')==='dark'?'light':'dark';
+    applyTheme(next);save(KEY_THEME,next);
+  };
+
+  /* 화면 그리기 */
+  function visible(){
+    var q=query.trim().toLowerCase();
+    return terms.filter(function(t){
+      if(cat!=='전체'&&t.category!==cat)return false;
+      if(!q)return true;
+      return t.name.toLowerCase().indexOf(q)>=0||t.meaning.toLowerCase().indexOf(q)>=0;
+    });
+  }
+
+  function renderTabs(){
+    var cats=categories();
+    if(cat!=='전체'&&cats.indexOf(cat)<0)cat='전체';
+    tabsEl.innerHTML=['전체'].concat(cats).map(function(c){
+      return '<button type="button" class="tab" data-cat="'+esc(c)+'" aria-pressed="'+(c===cat)+'">'+esc(c)+'</button>';
+    }).join('');
+    $('catList').innerHTML=cats.map(function(c){return '<option value="'+esc(c)+'">'}).join('');
+  }
+
+  function actions(id,name){
+    return '<button type="button" class="btn small" data-edit="'+esc(id)+'" aria-label="'+esc(name)+' 수정">수정</button>'+
+           '<button type="button" class="btn small danger" data-del="'+esc(id)+'" aria-label="'+esc(name)+' 삭제">삭제</button>';
+  }
+  function starMark(t){return t.star?'<span class="star" title="중요 용어" aria-label="중요 용어">★</span>':''}
+
+  function render(){
+    renderTabs();
+    $('viewBtn').textContent=view==='card'?'표로 보기':'카드로 보기';
+    var items=visible();
+    countEl.textContent='용어 '+items.length+'개';
+    if(!items.length){
+      listEl.innerHTML='<div class="empty">'+(terms.length?'조건에 맞는 용어가 없습니다. 검색어나 카테고리를 바꿔 보세요.':'아직 용어가 없습니다. “용어 추가” 버튼으로 첫 용어를 등록하세요.')+'</div>';
+      return;
+    }
+    if(view==='card'){
+      listEl.innerHTML='<div class="cards">'+items.map(function(t){
+        return '<article class="card"><h2>'+starMark(t)+'<span>'+esc(t.name)+'</span></h2>'+
+          '<span class="badge">'+esc(t.category)+'</span>'+
+          '<p class="meaning">'+esc(t.meaning)+'</p>'+
+          (t.example?'<p class="example">'+esc(t.example)+'</p>':'')+
+          '<div class="actions">'+actions(t.id,t.name)+'</div></article>';
+      }).join('')+'</div>';
+    }else{
+      listEl.innerHTML='<div class="table-wrap"><table><thead><tr><th>용어명</th><th>뜻</th><th>카테고리</th><th>예시 문장</th><th>관리</th></tr></thead><tbody>'+
+        items.map(function(t){
+          return '<tr><td>'+starMark(t)+' '+esc(t.name)+'</td><td>'+esc(t.meaning)+'</td><td>'+esc(t.category)+
+            '</td><td>'+esc(t.example||'')+'</td><td class="act">'+actions(t.id,t.name)+'</td></tr>';
+        }).join('')+'</tbody></table></div>';
+    }
+  }
+
+  /* 이벤트 */
+  $('search').oninput=function(e){query=e.target.value;render()};
+  $('viewBtn').onclick=function(){view=view==='card'?'table':'card';save(KEY_VIEW,view);render()};
+  tabsEl.onclick=function(e){
+    var b=e.target.closest('[data-cat]');if(!b)return;
+    cat=b.getAttribute('data-cat');render();
+  };
+  listEl.onclick=function(e){
+    var ed=e.target.closest('[data-edit]'),de=e.target.closest('[data-del]');
+    if(ed)openForm(ed.getAttribute('data-edit'));
+    if(de){
+      var id=de.getAttribute('data-del');
+      terms=terms.filter(function(t){return t.id!==id});
+      persist();render();
+    }
+  };
+
+  function openForm(id){
+    editingId=id||null;
+    var t=id?terms.filter(function(x){return x.id===id})[0]:null;
+    $('dlgTitle').textContent=t?'용어 수정':'용어 추가';
+    $('fName').value=t?t.name:'';
+    $('fMeaning').value=t?t.meaning:'';
+    $('fCat').value=t?t.category:(cat!=='전체'?cat:'');
+    $('fExample').value=t?(t.example||''):'';
+    $('fStar').checked=t?!!t.star:false;
+    dlg.showModal();
+    $('fName').focus();
+  }
+  $('addBtn').onclick=function(){openForm(null)};
+  $('cancelBtn').onclick=function(){dlg.close()};
+
+  $('form').onsubmit=function(e){
+    e.preventDefault();
+    var data={
+      name:$('fName').value.trim(),
+      meaning:$('fMeaning').value.trim(),
+      category:$('fCat').value.trim(),
+      example:$('fExample').value.trim(),
+      star:$('fStar').checked
+    };
+    if(!data.name||!data.meaning||!data.category)return;
+    if(editingId){
+      terms=terms.map(function(t){return t.id===editingId?Object.assign({},t,data):t});
+    }else{
+      data.id='t'+Date.now()+Math.random().toString(36).slice(2,6);
+      terms.push(data);
+    }
+    persist();dlg.close();render();
+  };
+
+  /* 내보내기 / 가져오기 */
+  $('exportBtn').onclick=function(){
+    var blob=new Blob([JSON.stringify(terms,null,2)],{type:'application/json'});
+    var a=document.createElement('a');
+    a.href=URL.createObjectURL(blob);
+    a.download='학습용어_백업.json';
+    document.body.appendChild(a);a.click();a.remove();
+    setTimeout(function(){URL.revokeObjectURL(a.href)},1000);
+  };
+  $('importBtn').onclick=function(){$('importFile').click()};
+  $('importFile').onchange=function(e){
+    var f=e.target.files[0];if(!f)return;
+    var r=new FileReader();
+    r.onload=function(){
+      try{
+        var arr=JSON.parse(r.result);
+        if(!Array.isArray(arr))throw 0;
+        var clean=arr.filter(function(t){return t&&t.name&&t.meaning&&t.category}).map(function(t,i){
+          return {id:String(t.id||('i'+Date.now()+i)),name:String(t.name),meaning:String(t.meaning),
+                  category:String(t.category),example:t.example?String(t.example):'',star:!!t.star};
+        });
+        if(!clean.length)throw 0;
+        terms=clean;persist();render();
+        alert('용어 '+clean.length+'개를 가져왔습니다. 기존 목록은 가져온 내용으로 바뀌었습니다.');
+      }catch(err){
+        alert('가져오지 못했습니다. 이 페이지에서 내보낸 백업 파일(.json)을 선택해 주세요.');
+      }
+    };
+    r.readAsText(f);
+    e.target.value='';
+  };
+
+  render();
+})();
+</script>
+</body>
+</html>
