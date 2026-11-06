@@ -1,0 +1,312 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>학습 용어 정리</title>
+<style>
+:root{--bg:#f1f4f8;--surface:#fff;--ink:#16202b;--muted:#5b6978;--line:#d8dee6;--accent:#2d49d6;--on-accent:#fff;--soft:#e7ebfc;--star:#d99500;--danger:#c0292b;color-scheme:light}
+:root[data-theme=dark]{--bg:#11151b;--surface:#1a2028;--ink:#e8edf3;--muted:#9aa8b6;--line:#2e3844;--accent:#8fa2ff;--on-accent:#0c1130;--soft:#252d4e;--star:#f2b933;--danger:#ff8080;color-scheme:dark}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font:16px/1.6 "Pretendard","Noto Sans KR","Apple SD Gothic Neo","Malgun Gothic",system-ui,sans-serif}
+.wrap{max-width:1040px;margin:0 auto;padding:20px 16px 56px}
+header{display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:12px;padding-bottom:14px;border-bottom:4px solid var(--accent);margin-bottom:18px}
+h1{margin:0;font-size:1.9rem;font-weight:800;letter-spacing:-.02em}
+.row{display:flex;flex-wrap:wrap;gap:8px;align-items:center}
+.btn{font:inherit;font-size:.92rem;font-weight:600;padding:8px 14px;border-radius:8px;border:1px solid var(--line);background:var(--surface);color:var(--ink);cursor:pointer}
+.btn:hover{border-color:var(--accent)}
+.btn.primary{background:var(--accent);border-color:var(--accent);color:var(--on-accent)}
+.btn.danger{color:var(--danger)}
+.btn.small{padding:4px 10px;font-size:.85rem}
+:focus-visible{outline:3px solid var(--accent);outline-offset:2px}
+.toolbar{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:14px}
+#q{flex:1 1 220px;min-width:0;font:inherit;padding:10px 14px;border-radius:8px;border:1px solid var(--line);background:var(--surface);color:var(--ink)}
+.tabs{display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin-bottom:10px}
+.tab{font:inherit;font-size:.92rem;padding:6px 14px;border-radius:999px;border:1px solid var(--line);background:var(--surface);color:var(--ink);cursor:pointer}
+.tab[aria-pressed=true]{background:var(--accent);border-color:var(--accent);color:var(--on-accent);font-weight:700}
+.sep{width:1px;height:22px;background:var(--line);margin:0 4px}
+.meta{color:var(--muted);font-size:.88rem;margin:6px 0 14px}
+.warn{color:var(--danger);font-size:.88rem;margin:0 0 10px}
+.cards{display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:14px}
+.card{background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:16px;display:flex;flex-direction:column;gap:6px}
+.top{display:flex;justify-content:space-between;align-items:center;gap:8px}
+.pill{background:var(--soft);color:var(--accent);font-size:.8rem;font-weight:700;padding:2px 10px;border-radius:999px}
+.card h3{margin:2px 0 0;font-size:1.2rem}
+.card p{margin:0;white-space:pre-wrap;overflow-wrap:anywhere}
+.ex{color:var(--muted);border-left:3px solid var(--line);padding-left:10px;font-size:.93rem}
+.acts{display:flex;gap:6px;margin-top:auto;padding-top:8px}
+.star{font-size:1.3rem;line-height:1;background:none;border:0;cursor:pointer;color:var(--muted);padding:2px 4px}
+.star[aria-pressed=true]{color:var(--star)}
+.tablewrap{overflow-x:auto;background:var(--surface);border:1px solid var(--line);border-radius:12px}
+table{border-collapse:collapse;width:100%;min-width:680px}
+th,td{text-align:left;padding:10px 12px;border-bottom:1px solid var(--line);vertical-align:top;overflow-wrap:anywhere}
+th{font-size:.85rem;color:var(--muted);background:var(--bg)}
+tr:last-child td{border-bottom:0}
+td.pre{white-space:pre-wrap}
+td.nm{font-weight:700}
+td .acts{padding:0}
+.empty{text-align:center;color:var(--muted);padding:48px 12px;background:var(--surface);border:1px dashed var(--line);border-radius:12px}
+dialog{border:1px solid var(--line);border-radius:14px;background:var(--surface);color:var(--ink);padding:20px;width:min(460px,92vw)}
+dialog::backdrop{background:rgba(0,0,0,.45)}
+dialog h2{margin:0 0 12px;font-size:1.2rem}
+label{display:block;font-size:.9rem;font-weight:600;margin-bottom:12px}
+label input:not([type=checkbox]),label textarea,label select{display:block;width:100%;margin-top:4px;font:inherit;font-weight:400;padding:8px 10px;border-radius:8px;border:1px solid var(--line);background:var(--bg);color:var(--ink)}
+label.check{display:flex;gap:8px;align-items:center;font-weight:400}
+.err{color:var(--danger);font-size:.88rem;margin:0 0 10px;min-height:1.2em}
+dialog .row{justify-content:flex-end}
+@media (max-width:640px){h1{font-size:1.5rem}.card{padding:14px}}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <h1>학습 용어 정리</h1>
+    <div class="row">
+      <button class="btn" id="exportBtn" type="button">내보내기</button>
+      <button class="btn" id="importBtn" type="button">가져오기</button>
+      <button class="btn" id="themeBtn" type="button" aria-pressed="false">다크 모드</button>
+      <input type="file" id="importFile" accept=".json,application/json" hidden>
+    </div>
+  </header>
+
+  <div class="toolbar">
+    <input id="q" type="search" placeholder="용어명 또는 뜻으로 검색" aria-label="용어 검색">
+    <button class="btn" id="viewBtn" type="button">표 보기</button>
+    <button class="btn primary" id="addTermBtn" type="button">용어 추가</button>
+  </div>
+
+  <div class="tabs" id="tabs"></div>
+  <p class="warn" id="warn" hidden>이 브라우저에서는 저장 공간을 쓸 수 없어, 변경 내용이 새로고침 후 사라질 수 있습니다.</p>
+  <p class="meta" id="meta"></p>
+  <main id="list"></main>
+</div>
+
+<dialog id="termDlg">
+  <form id="termForm">
+    <h2 id="termTitle"></h2>
+    <label>용어명<input id="fName" maxlength="60" autocomplete="off"></label>
+    <label>뜻<textarea id="fMeaning" rows="3"></textarea></label>
+    <label>카테고리<select id="fCat"></select></label>
+    <label>예시 문장 (선택)<textarea id="fExample" rows="2"></textarea></label>
+    <label class="check"><input type="checkbox" id="fStar"> 중요한 용어로 표시</label>
+    <p class="err" id="termErr"></p>
+    <div class="row"><button type="button" class="btn" data-close>취소</button><button class="btn primary">저장</button></div>
+  </form>
+</dialog>
+
+<dialog id="catDlg">
+  <form id="catForm">
+    <h2 id="catTitle"></h2>
+    <label>카테고리명<input id="cName" maxlength="30" autocomplete="off"></label>
+    <p class="err" id="catErr"></p>
+    <div class="row"><button type="button" class="btn" data-close>취소</button><button class="btn primary">저장</button></div>
+  </form>
+</dialog>
+
+<script>
+(function(){
+  var KEY='glossary-data-v1', THEME_KEY='glossary-theme-v1';
+  var storageOk=true;
+  var $=function(s){return document.querySelector(s)};
+  var uid=function(){return Date.now().toString(36)+Math.random().toString(36).slice(2,7)};
+  var esc=function(s){return String(s).replace(/[&<>"']/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]})};
+
+  function sample(){
+    var web=uid(), prog=uid();
+    return {
+      categories:[{id:web,name:'웹 기초'},{id:prog,name:'프로그래밍'}],
+      terms:[
+        {id:uid(),name:'HTML',meaning:'웹 페이지의 구조와 내용을 표시하는 마크업 언어',cat:web,star:true,example:'제목은 <h1> 태그로 표시한다.'},
+        {id:uid(),name:'CSS',meaning:'웹 페이지의 색상, 글꼴, 배치 같은 겉모양을 꾸미는 언어',cat:web,star:false,example:'글자 색을 바꾸려면 color 속성을 쓴다.'},
+        {id:uid(),name:'반응형 웹',meaning:'화면 크기에 따라 레이아웃이 자동으로 바뀌는 웹 디자인 방식',cat:web,star:false,example:'휴대폰에서는 카드가 한 줄로 쌓여 보인다.'},
+        {id:uid(),name:'변수',meaning:'값을 저장해 두고 이름으로 불러 쓰는 공간',cat:prog,star:true,example:'let count = 0; 에서 count가 변수다.'},
+        {id:uid(),name:'API',meaning:'프로그램끼리 정해진 방식으로 기능이나 데이터를 주고받게 해 주는 약속',cat:prog,star:false,example:'날씨 API로 오늘 기온을 가져온다.'}
+      ]
+    };
+  }
+
+  function normalize(d){
+    if(!d||!Array.isArray(d.categories)||!Array.isArray(d.terms))return null;
+    var cats=d.categories.filter(function(c){return c&&typeof c.id==='string'&&typeof c.name==='string'&&c.name.trim()}).map(function(c){return {id:c.id,name:c.name.trim()}});
+    var ids={};cats.forEach(function(c){ids[c.id]=1});
+    var terms=d.terms.filter(function(t){return t&&typeof t.id==='string'&&typeof t.name==='string'&&typeof t.meaning==='string'&&ids[t.cat]}).map(function(t){return {id:t.id,name:t.name,meaning:t.meaning,cat:t.cat,star:!!t.star,example:typeof t.example==='string'?t.example:''}});
+    return {categories:cats,terms:terms};
+  }
+
+  function load(){
+    try{
+      var raw=localStorage.getItem(KEY);
+      if(raw){var n=normalize(JSON.parse(raw));if(n)return n}
+    }catch(e){storageOk=false}
+    return sample();
+  }
+  function save(){
+    try{localStorage.setItem(KEY,JSON.stringify(state));storageOk=true}catch(e){storageOk=false}
+    $('#warn').hidden=storageOk;
+  }
+
+  var state=load();
+  var active='all', view='card', editingTerm=null, editingCat=null;
+  if(storageOk)save();
+  $('#warn').hidden=storageOk;
+
+  /* 다크 모드 */
+  function applyTheme(t){
+    document.documentElement.setAttribute('data-theme',t);
+    $('#themeBtn').textContent=t==='dark'?'라이트 모드':'다크 모드';
+    $('#themeBtn').setAttribute('aria-pressed',t==='dark');
+  }
+  var theme;
+  try{theme=localStorage.getItem(THEME_KEY)}catch(e){}
+  if(theme!=='dark'&&theme!=='light')theme=window.matchMedia&&matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light';
+  applyTheme(theme);
+  $('#themeBtn').onclick=function(){
+    theme=theme==='dark'?'light':'dark';applyTheme(theme);
+    try{localStorage.setItem(THEME_KEY,theme)}catch(e){}
+  };
+
+  function catName(id){var c=state.categories.filter(function(c){return c.id===id})[0];return c?c.name:''}
+
+  /* 화면 그리기 */
+  function renderTabs(){
+    var h='<button class="tab" data-cat="all" aria-pressed="'+(active==='all')+'">전체</button>';
+    state.categories.forEach(function(c){h+='<button class="tab" data-cat="'+esc(c.id)+'" aria-pressed="'+(active===c.id)+'">'+esc(c.name)+'</button>'});
+    h+='<span class="sep"></span><button class="btn small" id="addCatBtn" type="button">카테고리 추가</button>';
+    if(active!=='all')h+='<button class="btn small" id="editCatBtn" type="button">카테고리 수정</button><button class="btn small danger" id="delCatBtn" type="button">카테고리 삭제</button>';
+    $('#tabs').innerHTML=h;
+  }
+
+  function acts(t){return '<div class="acts"><button class="btn small" data-act="edit" data-id="'+esc(t.id)+'">수정</button><button class="btn small danger" data-act="del" data-id="'+esc(t.id)+'">삭제</button></div>'}
+  function star(t){return '<button class="star" data-act="star" data-id="'+esc(t.id)+'" aria-pressed="'+t.star+'" aria-label="중요 표시" title="중요 표시">'+(t.star?'★':'☆')+'</button>'}
+
+  function render(){
+    renderTabs();
+    var q=$('#q').value.trim().toLowerCase();
+    var list=state.terms.filter(function(t){
+      return (active==='all'||t.cat===active)&&(!q||t.name.toLowerCase().indexOf(q)>-1||t.meaning.toLowerCase().indexOf(q)>-1);
+    });
+    $('#meta').textContent='전체 '+state.terms.length+'개 중 '+list.length+'개 표시';
+    $('#viewBtn').textContent=view==='card'?'표 보기':'카드 보기';
+    var h;
+    if(!list.length){
+      h='<div class="empty">'+(state.terms.length?'조건에 맞는 용어가 없습니다. 검색어나 카테고리를 바꿔 보세요.':'아직 용어가 없습니다. ‘용어 추가’ 버튼으로 첫 용어를 등록해 보세요.')+'</div>';
+    }else if(view==='card'){
+      h='<div class="cards">'+list.map(function(t){
+        return '<article class="card"><div class="top"><span class="pill">'+esc(catName(t.cat))+'</span>'+star(t)+'</div><h3>'+esc(t.name)+'</h3><p>'+esc(t.meaning)+'</p>'+(t.example?'<p class="ex">'+esc(t.example)+'</p>':'')+acts(t)+'</article>';
+      }).join('')+'</div>';
+    }else{
+      h='<div class="tablewrap"><table><thead><tr><th>중요</th><th>용어명</th><th>뜻</th><th>예시 문장</th><th>카테고리</th><th>관리</th></tr></thead><tbody>'+list.map(function(t){
+        return '<tr><td>'+star(t)+'</td><td class="nm">'+esc(t.name)+'</td><td class="pre">'+esc(t.meaning)+'</td><td class="pre">'+esc(t.example)+'</td><td><span class="pill">'+esc(catName(t.cat))+'</span></td><td>'+acts(t)+'</td></tr>';
+      }).join('')+'</tbody></table></div>';
+    }
+    $('#list').innerHTML=h;
+  }
+
+  /* 검색 / 보기 전환 */
+  $('#q').addEventListener('input',render);
+  $('#viewBtn').onclick=function(){view=view==='card'?'table':'card';render()};
+
+  /* 카테고리 */
+  $('#tabs').addEventListener('click',function(e){
+    var b=e.target.closest('button');if(!b)return;
+    if(b.dataset.cat){active=b.dataset.cat;render();return}
+    if(b.id==='addCatBtn')openCat(null);
+    else if(b.id==='editCatBtn')openCat(active);
+    else if(b.id==='delCatBtn')deleteCat(active);
+  });
+  function openCat(id){
+    editingCat=id;
+    $('#catTitle').textContent=id?'카테고리 수정':'카테고리 추가';
+    $('#cName').value=id?catName(id):'';
+    $('#catErr').textContent='';
+    $('#catDlg').showModal();$('#cName').focus();
+  }
+  $('#catForm').addEventListener('submit',function(e){
+    e.preventDefault();
+    var name=$('#cName').value.trim();
+    if(!name){$('#catErr').textContent='카테고리명을 입력해 주세요.';return}
+    var dup=state.categories.some(function(c){return c.name===name&&c.id!==editingCat});
+    if(dup){$('#catErr').textContent='이미 있는 카테고리명입니다.';return}
+    if(editingCat){state.categories.forEach(function(c){if(c.id===editingCat)c.name=name})}
+    else{var c={id:uid(),name:name};state.categories.push(c);active=c.id}
+    save();$('#catDlg').close();render();
+  });
+  function deleteCat(id){
+    var n=state.terms.filter(function(t){return t.cat===id}).length;
+    if(n){alert('이 카테고리에 용어 '+n+'개가 있어 삭제할 수 없습니다. 용어를 다른 카테고리로 옮기거나 삭제한 뒤 다시 시도해 주세요.');return}
+    if(!confirm('‘'+catName(id)+'’ 카테고리를 삭제할까요?'))return;
+    state.categories=state.categories.filter(function(c){return c.id!==id});
+    active='all';save();render();
+  }
+
+  /* 용어 */
+  function fillCatSelect(sel){
+    $('#fCat').innerHTML=state.categories.map(function(c){return '<option value="'+esc(c.id)+'"'+(c.id===sel?' selected':'')+'>'+esc(c.name)+'</option>'}).join('');
+  }
+  function openTerm(id){
+    if(!state.categories.length){alert('먼저 카테고리를 추가해 주세요.');openCat(null);return}
+    editingTerm=id;
+    var t=id?state.terms.filter(function(x){return x.id===id})[0]:null;
+    $('#termTitle').textContent=t?'용어 수정':'용어 추가';
+    $('#fName').value=t?t.name:'';
+    $('#fMeaning').value=t?t.meaning:'';
+    $('#fExample').value=t?t.example:'';
+    $('#fStar').checked=t?t.star:false;
+    fillCatSelect(t?t.cat:(active!=='all'?active:state.categories[0].id));
+    $('#termErr').textContent='';
+    $('#termDlg').showModal();$('#fName').focus();
+  }
+  $('#addTermBtn').onclick=function(){openTerm(null)};
+  $('#termForm').addEventListener('submit',function(e){
+    e.preventDefault();
+    var name=$('#fName').value.trim(), meaning=$('#fMeaning').value.trim();
+    if(!name){$('#termErr').textContent='용어명을 입력해 주세요.';return}
+    if(!meaning){$('#termErr').textContent='뜻을 입력해 주세요.';return}
+    var data={name:name,meaning:meaning,cat:$('#fCat').value,example:$('#fExample').value.trim(),star:$('#fStar').checked};
+    if(editingTerm){state.terms.forEach(function(t){if(t.id===editingTerm){t.name=data.name;t.meaning=data.meaning;t.cat=data.cat;t.example=data.example;t.star=data.star}})}
+    else{data.id=uid();state.terms.push(data)}
+    save();$('#termDlg').close();render();
+  });
+  $('#list').addEventListener('click',function(e){
+    var b=e.target.closest('button[data-act]');if(!b)return;
+    var id=b.dataset.id, act=b.dataset.act;
+    if(act==='edit')openTerm(id);
+    else if(act==='star'){state.terms.forEach(function(t){if(t.id===id)t.star=!t.star});save();render()}
+    else if(act==='del'){
+      var t=state.terms.filter(function(x){return x.id===id})[0];
+      if(t&&confirm('‘'+t.name+'’ 용어를 삭제할까요?')){state.terms=state.terms.filter(function(x){return x.id!==id});save();render()}
+    }
+  });
+
+  /* 대화상자 닫기 버튼 */
+  document.querySelectorAll('[data-close]').forEach(function(b){b.onclick=function(){b.closest('dialog').close()}});
+
+  /* 내보내기 / 가져오기 */
+  $('#exportBtn').onclick=function(){
+    var blob=new Blob([JSON.stringify(state,null,2)],{type:'application/json'});
+    var a=document.createElement('a');
+    a.href=URL.createObjectURL(blob);a.download='학습용어_백업.json';
+    document.body.appendChild(a);a.click();a.remove();
+    setTimeout(function(){URL.revokeObjectURL(a.href)},1000);
+  };
+  $('#importBtn').onclick=function(){$('#importFile').click()};
+  $('#importFile').addEventListener('change',function(){
+    var f=this.files[0], input=this;if(!f)return;
+    var r=new FileReader();
+    r.onload=function(){
+      var n=null;
+      try{n=normalize(JSON.parse(r.result))}catch(e){}
+      if(!n){alert('올바른 백업 파일이 아닙니다. 내보내기로 만든 .json 파일을 선택해 주세요.')}
+      else if(confirm('백업 파일의 내용(카테고리 '+n.categories.length+'개, 용어 '+n.terms.length+'개)으로 현재 데이터를 모두 바꿀까요?')){
+        state=n;active='all';save();render();
+      }
+      input.value='';
+    };
+    r.readAsText(f);
+  });
+
+  render();
+})();
+</script>
+</body>
+</html>
