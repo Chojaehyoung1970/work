@@ -1,0 +1,615 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>학습 자료 및 링크 정리</title>
+    <style>
+        /* CSS: 디자인 및 반응형 레이아웃 설정 */
+        :root {
+            /* 라이트 모드 색상 변수 */
+            --bg-color: #f4f6f8;
+            --text-color: #333333;
+            --header-bg: #ffffff;
+            --card-bg: #ffffff;
+            --border-color: #dddddd;
+            --primary-color: #4a90e2;
+            --primary-hover: #357abd;
+            --danger-color: #e74c3c;
+            --danger-hover: #c0392b;
+            --input-bg: #ffffff;
+        }
+
+        [data-theme="dark"] {
+            /* 다크 모드 색상 변수 */
+            --bg-color: #121212;
+            --text-color: #e0e0e0;
+            --header-bg: #1e1e1e;
+            --card-bg: #242424;
+            --border-color: #444444;
+            --primary-color: #3b82f6;
+            --primary-hover: #2563eb;
+            --danger-color: #ef4444;
+            --danger-hover: #dc2626;
+            --input-bg: #333333;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: 'Pretendard', -apple-system, BlinkMacSystemFont, system-ui, Roboto, 'Helvetica Neue', 'Segoe UI', 'Apple SD Gothic Neo', 'Noto Sans KR', 'Malgun Gothic', sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            transition: background-color 0.3s, color 0.3s;
+            line-height: 1.5;
+        }
+
+        /* 상단 바 스타일 */
+        header {
+            background-color: var(--header-bg);
+            padding: 1rem 2rem;
+            border-bottom: 1px solid var(--border-color);
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: space-between;
+            align-items: center;
+            gap: 1rem;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        h1 {
+            font-size: 1.5rem;
+            margin: 0;
+        }
+
+        .controls {
+            display: flex;
+            gap: 0.5rem;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+
+        button, select {
+            padding: 0.5rem 1rem;
+            border: 1px solid var(--border-color);
+            border-radius: 4px;
+            background-color: var(--card-bg);
+            color: var(--text-color);
+            cursor: pointer;
+            font-size: 0.9rem;
+            transition: all 0.2s;
+        }
+
+        button:hover {
+            background-color: var(--border-color);
+        }
+
+        button.primary {
+            background-color: var(--primary-color);
+            color: white;
+            border: none;
+        }
+
+        button.primary:hover {
+            background-color: var(--primary-hover);
+        }
+
+        button.danger {
+            background-color: var(--danger-color);
+            color: white;
+            border: none;
+        }
+
+        button.danger:hover {
+            background-color: var(--danger-hover);
+        }
+
+        /* 메인 콘텐츠 영역 */
+        main {
+            padding: 2rem;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        /* 카드 뷰 스타일 */
+        .view-card {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 1.5rem;
+        }
+
+        .card {
+            background-color: var(--card-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            padding: 1.5rem;
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+        }
+
+        .card-header {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            font-size: 1.2rem;
+            font-weight: bold;
+        }
+
+        .card-category {
+            display: inline-block;
+            background-color: var(--primary-color);
+            color: white;
+            padding: 0.2rem 0.5rem;
+            border-radius: 4px;
+            font-size: 0.8rem;
+            align-self: flex-start;
+        }
+
+        .card-link {
+            color: var(--primary-color);
+            text-decoration: none;
+            word-break: break-all;
+        }
+        
+        .card-link:hover {
+            text-decoration: underline;
+        }
+
+        .card-desc {
+            font-size: 0.95rem;
+            color: var(--text-color);
+            opacity: 0.8;
+            flex-grow: 1;
+        }
+
+        .card-tags {
+            font-size: 0.85rem;
+            color: #888;
+        }
+
+        .card-actions {
+            display: flex;
+            gap: 0.5rem;
+            margin-top: 1rem;
+            justify-content: flex-end;
+        }
+
+        /* 테이블 뷰 스타일 */
+        .view-table-container {
+            overflow-x: auto;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            background-color: var(--card-bg);
+            border-radius: 8px;
+            overflow: hidden;
+        }
+
+        th, td {
+            padding: 1rem;
+            text-align: left;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        th {
+            background-color: var(--header-bg);
+            font-weight: bold;
+            white-space: nowrap;
+        }
+
+        td a {
+            color: var(--primary-color);
+            text-decoration: none;
+        }
+
+        td a:hover {
+            text-decoration: underline;
+        }
+
+        .table-actions {
+            display: flex;
+            gap: 0.5rem;
+        }
+
+        /* 모달(입력 폼) 스타일 */
+        .modal-overlay {
+            position: fixed;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background-color: rgba(0,0,0,0.5);
+            display: none;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+        }
+
+        .modal-overlay.active {
+            display: flex;
+        }
+
+        .modal {
+            background-color: var(--card-bg);
+            padding: 2rem;
+            border-radius: 8px;
+            width: 100%;
+            max-width: 500px;
+            max-height: 90vh;
+            overflow-y: auto;
+        }
+
+        .modal h2 {
+            margin-bottom: 1.5rem;
+        }
+
+        .form-group {
+            margin-bottom: 1rem;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-weight: bold;
+        }
+
+        .form-group input, .form-group select, .form-group textarea {
+            width: 100%;
+            padding: 0.5rem;
+            border: 1px solid var(--border-color);
+            border-radius: 4px;
+            background-color: var(--input-bg);
+            color: var(--text-color);
+        }
+
+        .category-input-group {
+            display: flex;
+            gap: 0.5rem;
+        }
+
+        .modal-actions {
+            display: flex;
+            justify-content: flex-end;
+            gap: 0.5rem;
+            margin-top: 1.5rem;
+        }
+
+        /* 반응형 처리 */
+        @media (max-width: 600px) {
+            header {
+                flex-direction: column;
+                align-items: stretch;
+            }
+            .controls {
+                justify-content: space-between;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- 상단 바 -->
+    <header>
+        <h1>📚 내 학습 자료</h1>
+        <div class="controls">
+            <button id="toggleViewBtn" onclick="toggleView()">보기: 카드</button>
+            <select id="sortSelect" onchange="renderData()">
+                <option value="recent">최근 추가순</option>
+                <option value="name">이름순</option>
+            </select>
+            <button onclick="toggleDarkMode()">🌙 다크 모드</button>
+            <button class="primary" onclick="openModal()">+ 자료 추가</button>
+        </div>
+    </header>
+
+    <!-- 메인 콘텐츠 (자료 목록) -->
+    <main>
+        <div id="listContainer" class="view-card">
+            <!-- 자바스크립트를 통해 여기에 자료가 렌더링됩니다. -->
+        </div>
+    </main>
+
+    <!-- 자료 입력/수정 폼 (모달) -->
+    <div class="modal-overlay" id="modalOverlay">
+        <div class="modal">
+            <h2 id="modalTitle">자료 추가</h2>
+            <form id="materialForm" onsubmit="saveMaterial(event)">
+                <input type="hidden" id="materialId">
+                
+                <div class="form-group">
+                    <label for="mTitle">제목 *</label>
+                    <input type="text" id="mTitle" required placeholder="예: 자바스크립트 기초 강의">
+                </div>
+                
+                <div class="form-group">
+                    <label for="mUrl">URL (링크) *</label>
+                    <input type="url" id="mUrl" required placeholder="https://...">
+                </div>
+                
+                <div class="form-group">
+                    <label for="mCategory">카테고리 *</label>
+                    <div class="category-input-group">
+                        <select id="mCategory" required></select>
+                        <button type="button" onclick="addCustomCategory()">+ 새 카테고리</button>
+                    </div>
+                </div>
+                
+                <div class="form-group">
+                    <label for="mDesc">설명</label>
+                    <textarea id="mDesc" rows="3" placeholder="자료에 대한 간단한 설명"></textarea>
+                </div>
+                
+                <div class="form-group">
+                    <label for="mTags">태그 (쉼표로 구분)</label>
+                    <input type="text" id="mTags" placeholder="예: 프론트엔드, 기초, JS">
+                </div>
+                
+                <div class="form-group">
+                    <label for="mIcon">아이콘 (이모지 등)</label>
+                    <input type="text" id="mIcon" placeholder="예: 💻" maxlength="5">
+                </div>
+
+                <div class="modal-actions">
+                    <button type="button" onclick="closeModal()">취소</button>
+                    <button type="submit" class="primary">저장</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        /* JavaScript: 데이터 관리 및 화면 동작 */
+
+        // 1. 초기 데이터 및 상태 설정
+        const STORAGE_KEY = 'learning_materials_data';
+        const CATEGORY_KEY = 'learning_materials_categories';
+        
+        let materials = [];
+        let categories = ['강의', '문서', '블로그', '영상', '기타'];
+        let currentView = 'card'; // 'card' 또는 'table'
+
+        // 샘플 데이터 5개
+        const sampleData = [
+            { id: 1, title: "MDN Web Docs", url: "https://developer.mozilla.org/ko/", category: "문서", desc: "웹 개발자를 위한 공식 문서", tags: "HTML, CSS, JS", icon: "🌐", createdAt: 1000 },
+            { id: 2, title: "생활코딩", url: "https://opentutorials.org/", category: "강의", desc: "일반인을 위한 프로그래밍 무료 강의", tags: "기초, 웹, 서버", icon: "👨‍💻", createdAt: 2000 },
+            { id: 3, title: "벨롭퍼트와 함께하는 모던 리액트", url: "https://react.vlpt.us/", category: "블로그", desc: "리액트 학습을 위한 훌륭한 가이드", tags: "React, 프론트엔드", icon: "⚛️", createdAt: 3000 },
+            { id: 4, title: "노마드코더 유튜브", url: "https://www.youtube.com/c/NomadCoders", category: "영상", desc: "트렌디한 IT 기술 및 코딩 영상", tags: "유튜브, 트렌드", icon: "📺", createdAt: 4000 },
+            { id: 5, title: "정규표현식 테스트 사이트", url: "https://regexr.com/", category: "기타", desc: "정규표현식을 작성하고 테스트할 수 있는 유용한 도구", tags: "도구, 정규식", icon: "🛠️", createdAt: 5000 }
+        ];
+
+        // 2. 초기화 함수 (페이지 로드 시 실행)
+        function init() {
+            // 로컬 스토리지에서 데이터 불러오기
+            const storedMaterials = localStorage.getItem(STORAGE_KEY);
+            if (storedMaterials) {
+                materials = JSON.parse(storedMaterials);
+            } else {
+                materials = [...sampleData]; // 저장된 게 없으면 샘플 데이터 사용
+                saveToStorage();
+            }
+
+            const storedCategories = localStorage.getItem(CATEGORY_KEY);
+            if (storedCategories) {
+                categories = JSON.parse(storedCategories);
+            }
+
+            updateCategorySelect();
+            renderData();
+        }
+
+        // 3. 데이터 저장 함수
+        function saveToStorage() {
+            localStorage.setItem(STORAGE_KEY, JSON.stringify(materials));
+            localStorage.setItem(CATEGORY_KEY, JSON.stringify(categories));
+        }
+
+        // 4. 화면 렌더링 함수 (표/카드 전환 및 정렬 반영)
+        function renderData() {
+            const container = document.getElementById('listContainer');
+            const sortType = document.getElementById('sortSelect').value;
+
+            // 정렬 로직
+            let sortedMaterials = [...materials];
+            if (sortType === 'name') {
+                sortedMaterials.sort((a, b) => a.title.localeCompare(b.title)); // 이름순
+            } else {
+                sortedMaterials.sort((a, b) => b.createdAt - a.createdAt); // 최근 추가순 (내림차순)
+            }
+
+            container.innerHTML = ''; // 기존 내용 지우기
+
+            if (sortedMaterials.length === 0) {
+                container.innerHTML = '<p style="grid-column: 1/-1; text-align: center; padding: 2rem;">저장된 자료가 없습니다. 자료를 추가해 보세요!</p>';
+                return;
+            }
+
+            if (currentView === 'card') {
+                container.className = 'view-card';
+                sortedMaterials.forEach(item => {
+                    container.innerHTML += `
+                        <div class="card">
+                            <div class="card-header">
+                                <span>${item.icon || '📄'}</span>
+                                <span>${item.title}</span>
+                            </div>
+                            <span class="card-category">${item.category}</span>
+                            <a href="${item.url}" target="_blank" class="card-link">${item.url}</a>
+                            <p class="card-desc">${item.desc || '설명 없음'}</p>
+                            <p class="card-tags">${item.tags ? '#' + item.tags.split(',').map(t=>t.trim()).join(' #') : ''}</p>
+                            <div class="card-actions">
+                                <button onclick="editMaterial(${item.id})">수정</button>
+                                <button class="danger" onclick="deleteMaterial(${item.id})">삭제</button>
+                            </div>
+                        </div>
+                    `;
+                });
+            } else {
+                container.className = 'view-table-container';
+                let tableHTML = `
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>아이콘</th>
+                                <th>제목</th>
+                                <th>카테고리</th>
+                                <th>링크</th>
+                                <th>설명</th>
+                                <th>태그</th>
+                                <th>관리</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                `;
+                sortedMaterials.forEach(item => {
+                    tableHTML += `
+                        <tr>
+                            <td>${item.icon || '📄'}</td>
+                            <td><strong>${item.title}</strong></td>
+                            <td><span class="card-category">${item.category}</span></td>
+                            <td><a href="${item.url}" target="_blank">이동</a></td>
+                            <td>${item.desc || '-'}</td>
+                            <td>${item.tags || '-'}</td>
+                            <td class="table-actions">
+                                <button onclick="editMaterial(${item.id})">수정</button>
+                                <button class="danger" onclick="deleteMaterial(${item.id})">삭제</button>
+                            </td>
+                        </tr>
+                    `;
+                });
+                tableHTML += `</tbody></table>`;
+                container.innerHTML = tableHTML;
+            }
+        }
+
+        // 5. 보기 전환 (표 ↔ 카드)
+        function toggleView() {
+            const btn = document.getElementById('toggleViewBtn');
+            if (currentView === 'card') {
+                currentView = 'table';
+                btn.innerText = '보기: 표';
+            } else {
+                currentView = 'card';
+                btn.innerText = '보기: 카드';
+            }
+            renderData();
+        }
+
+        // 6. 다크 모드 전환
+        function toggleDarkMode() {
+            const body = document.body;
+            if (body.getAttribute('data-theme') === 'dark') {
+                body.removeAttribute('data-theme');
+            } else {
+                body.setAttribute('data-theme', 'dark');
+            }
+        }
+
+        // 7. 모달 열기/닫기
+        function openModal(id = null) {
+            document.getElementById('modalOverlay').classList.add('active');
+            const form = document.getElementById('materialForm');
+            form.reset();
+            
+            if (id) {
+                // 수정 모드
+                document.getElementById('modalTitle').innerText = '자료 수정';
+                const item = materials.find(m => m.id === id);
+                document.getElementById('materialId').value = item.id;
+                document.getElementById('mTitle').value = item.title;
+                document.getElementById('mUrl').value = item.url;
+                document.getElementById('mCategory').value = item.category;
+                document.getElementById('mDesc').value = item.desc;
+                document.getElementById('mTags').value = item.tags;
+                document.getElementById('mIcon').value = item.icon;
+            } else {
+                // 추가 모드
+                document.getElementById('modalTitle').innerText = '자료 추가';
+                document.getElementById('materialId').value = '';
+            }
+        }
+
+        function closeModal() {
+            document.getElementById('modalOverlay').classList.remove('active');
+        }
+
+        // 8. 자료 저장 (추가 및 수정)
+        function saveMaterial(event) {
+            event.preventDefault(); // 폼 제출 시 새로고침 방지
+
+            const id = document.getElementById('materialId').value;
+            const newMaterial = {
+                title: document.getElementById('mTitle').value,
+                url: document.getElementById('mUrl').value,
+                category: document.getElementById('mCategory').value,
+                desc: document.getElementById('mDesc').value,
+                tags: document.getElementById('mTags').value,
+                icon: document.getElementById('mIcon').value,
+            };
+
+            if (id) {
+                // 기존 자료 수정
+                const index = materials.findIndex(m => m.id === parseInt(id));
+                newMaterial.id = parseInt(id);
+                newMaterial.createdAt = materials[index].createdAt; // 기존 생성 시간 유지
+                materials[index] = newMaterial;
+            } else {
+                // 새 자료 추가
+                newMaterial.id = Date.now(); // 현재 시간을 고유 ID로 사용
+                newMaterial.createdAt = Date.now();
+                materials.push(newMaterial);
+            }
+
+            saveToStorage();
+            closeModal();
+            renderData();
+        }
+
+        // 9. 자료 삭제
+        function deleteMaterial(id) {
+            if (confirm('정말로 이 자료를 삭제하시겠습니까?')) {
+                materials = materials.filter(m => m.id !== id);
+                saveToStorage();
+                renderData();
+            }
+        }
+
+        // 10. 카테고리 관련 기능
+        function updateCategorySelect() {
+            const select = document.getElementById('mCategory');
+            select.innerHTML = '';
+            categories.forEach(cat => {
+                const option = document.createElement('option');
+                option.value = cat;
+                option.innerText = cat;
+                select.appendChild(option);
+            });
+        }
+
+        function addCustomCategory() {
+            const newCat = prompt('새로 추가할 카테고리 이름을 입력하세요:');
+            if (newCat && newCat.trim() !== '') {
+                const trimmedCat = newCat.trim();
+                if (!categories.includes(trimmedCat)) {
+                    categories.push(trimmedCat);
+                    saveToStorage();
+                    updateCategorySelect();
+                    document.getElementById('mCategory').value = trimmedCat; // 방금 추가한 항목 선택
+                } else {
+                    alert('이미 존재하는 카테고리입니다.');
+                }
+            }
+        }
+
+        // 앱 시작
+        init();
+
+    </script>
+</body>
+</html>
