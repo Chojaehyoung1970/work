@@ -2,25 +2,27 @@
 <html lang="ko">
 <head>
     <meta charset="UTF-8">
-    <title>3D Pro Penalty Kick</title>
+    <title>3D 페널티킥 게임 - 최종판</title>
     <style>
-        body { margin: 0; overflow: hidden; background-color: #000; font-family: sans-serif; }
-        #ui { position: absolute; top: 20px; left: 20px; color: white; font-size: 20px; text-shadow: 2px 2px 4px #000; pointer-events: none; }
+        body { margin: 0; overflow: hidden; background-color: #87CEEB; font-family: sans-serif; }
+        #ui { position: absolute; top: 20px; left: 20px; color: white; font-size: 22px; font-weight: bold; text-shadow: 2px 2px 4px #000; pointer-events: none; }
         #msg { position: absolute; top: 40%; left: 50%; transform: translate(-50%, -50%); color: yellow; font-size: 60px; font-weight: bold; display: none; text-shadow: 4px 4px 10px #000; }
+        #guide { position: absolute; bottom: 20px; left: 50%; transform: translateX(-50%); color: white; font-size: 18px; background: rgba(0,0,0,0.5); padding: 10px 20px; border-radius: 20px; }
     </style>
 </head>
 <body>
-    <div id="ui">Score: <span id="score">0</span> / Attempts: <span id="attempts">0</span> (Left: <span id="remains">5</span>)</div>
+    <div id="ui">점수: <span id="score">0</span> / 시도: <span id="attempts">0</span> (남은 기회: <span id="remains">5</span>)</div>
     <div id="msg">GOAL!</div>
+    <div id="guide">공을 위쪽(골대 방향)으로 빠르게 드래그하세요!</div>
 
+    <!-- 라이브러리 로드 -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/tween.js/18.6.4/tween.umd.js"></script>
 
     <script>
-        // 1. Scene & Camera
+        // 1. 기본 설정
         const scene = new THREE.Scene();
-        scene.background = new THREE.Color(0x87CEEB);
-        scene.fog = new THREE.Fog(0x87CEEB, 20, 100);
+        scene.background = new THREE.Color(0x87CEEB); // 하늘색 배경
 
         const camera = new THREE.PerspectiveCamera(60, window.innerWidth / window.innerHeight, 0.1, 1000);
         camera.position.set(0, 3, 12);
@@ -31,46 +33,47 @@
         renderer.shadowMap.enabled = true;
         document.body.appendChild(renderer.domElement);
 
-        // 2. Lights
-        const ambient = new THREE.AmbientLight(0xffffff, 0.5);
+        // 2. 조명
+        const ambient = new THREE.AmbientLight(0xffffff, 0.6);
         scene.add(ambient);
-        const sun = new THREE.DirectionalLight(0xffffff, 1);
+        const sun = new THREE.DirectionalLight(0xffffff, 0.8);
         sun.position.set(5, 15, 10);
         sun.castShadow = true;
         scene.add(sun);
 
-        // 3. Environment (Stadium)
-        // Grass
+        // 3. 경기장 환경 (잔디, 광고판, 관중석)
+        // 잔디
         const grass = new THREE.Mesh(
             new THREE.PlaneGeometry(100, 100),
-            new THREE.MeshStandardMaterial({ color: 0x3d8c40 })
+            new THREE.MeshStandardMaterial({ color: 0x2e7d32 })
         );
         grass.rotation.x = -Math.PI / 2;
         grass.receiveShadow = true;
         scene.add(grass);
 
-        // Ad boards (광고판)
-        function createAdBoard(x, z, rotY) {
-            const board = new THREE.Mesh(
-                new THREE.BoxGeometry(8, 1.5, 0.5),
-                new THREE.MeshStandardMaterial({ color: 0xeeeeee })
+        // 광고판 (Ad Boards)
+        function createAd(x, z, ry) {
+            const ad = new THREE.Mesh(
+                new THREE.BoxGeometry(10, 1.5, 0.5),
+                new THREE.MeshStandardMaterial({ color: 0xffffff })
             );
-            board.position.set(x, 0.75, z);
-            board.rotation.y = rotY;
-            scene.add(board);
+            ad.position.set(x, 0.75, z);
+            ad.rotation.y = ry;
+            scene.add(ad);
         }
-        createAdBoard(-10, -10, Math.PI/4);
-        createAdBoard(10, -10, -Math.PI/4);
-        createAdBoard(0, -18, 0);
+        createAd(-12, -10, Math.PI/4);
+        createAd(12, -10, -Math.PI/4);
+        createAd(0, -18, 0);
 
-        // Stands (관중석)
-        const standGeo = new THREE.BoxGeometry(40, 10, 10);
-        const standMat = new THREE.MeshStandardMaterial({ color: 0x555555 });
-        const stand = new THREE.Mesh(standGeo, standMat);
-        stand.position.set(0, 2, -25);
+        // 관중석 (Stands)
+        const stand = new THREE.Mesh(
+            new THREE.BoxGeometry(60, 15, 10),
+            new THREE.MeshStandardMaterial({ color: 0x666666 })
+        );
+        stand.position.set(0, 5, -25);
         scene.add(stand);
 
-        // 4. Goal
+        // 4. 골대
         const goal = new THREE.Group();
         const postMat = new THREE.MeshStandardMaterial({ color: 0xffffff });
         const bar = new THREE.Mesh(new THREE.BoxGeometry(10, 0.3, 0.3), postMat);
@@ -83,104 +86,126 @@
         goal.position.z = -15;
         scene.add(goal);
 
-        // 5. Soccer Ball (Canvas Texture)
-        function createBallTexture() {
+        // 5. 축구공 (무늬 텍스처 생성)
+        function createSoccerBall() {
             const canvas = document.createElement('canvas');
-            canvas.width = 128; canvas.height = 128;
+            canvas.width = 256; canvas.height = 256;
             const ctx = canvas.getContext('2d');
             ctx.fillStyle = 'white';
-            ctx.fillRect(0, 0, 128, 128);
+            ctx.fillRect(0, 0, 256, 256);
             ctx.fillStyle = 'black';
-            for(let i=0; i<10; i++) {
+            for(let i=0; i<20; i++) {
                 ctx.beginPath();
-                ctx.arc(Math.random()*128, Math.random()*128, 15, 0, Math.PI*2);
+                ctx.arc(Math.random()*256, Math.random()*256, 20, 0, Math.PI*2);
                 ctx.fill();
             }
-            return new THREE.CanvasTexture(canvas);
+            const texture = new THREE.CanvasTexture(canvas);
+            const ball = new THREE.Mesh(
+                new THREE.SphereGeometry(0.4, 32, 32),
+                new THREE.MeshStandardMaterial({ map: texture })
+            );
+            ball.castShadow = true;
+            return ball;
         }
-        const ball = new THREE.Mesh(
-            new THREE.SphereGeometry(0.4, 32, 32),
-            new THREE.MeshStandardMaterial({ map: createBallTexture() })
-        );
+        const ball = createSoccerBall();
         ball.position.set(0, 0.4, 5);
-        ball.castShadow = true;
         scene.add(ball);
 
-        // 6. Humanoid Goalkeeper
+        // 6. 인간형 골키퍼 (GK)
         const gk = new THREE.Group();
-        const skinMat = new THREE.MeshStandardMaterial({ color: 0xffdbac });
-        const clothMat = new THREE.MeshStandardMaterial({ color: 0x0000ff });
+        const skin = new THREE.MeshStandardMaterial({ color: 0xffdbac });
+        const kit = new THREE.MeshStandardMaterial({ color: 0xff0000 });
         
-        const head = new THREE.Mesh(new THREE.BoxGeometry(0.6, 0.6, 0.6), skinMat);
+        const head = new THREE.Mesh(new THREE.BoxGeometry(0.6, 0.6, 0.6), skin);
         head.position.y = 2.5;
-        const body = new THREE.Mesh(new THREE.BoxGeometry(1, 1.2, 0.5), clothMat);
+        const body = new THREE.Mesh(new THREE.BoxGeometry(1, 1.2, 0.5), kit);
         body.position.y = 1.6;
-        const armL = new THREE.Mesh(new THREE.BoxGeometry(0.3, 1, 0.3), skinMat);
-        armL.position.set(-0.7, 1.7, 0);
-        const armR = new THREE.Mesh(new THREE.BoxGeometry(0.3, 1, 0.3), skinMat);
-        armR.position.set(0.7, 1.7, 0);
-        const legL = new THREE.Mesh(new THREE.BoxGeometry(0.4, 1, 0.4), clothMat);
+        const armL = new THREE.Mesh(new THREE.BoxGeometry(0.3, 1.2, 0.3), skin);
+        armL.position.set(-0.7, 1.8, 0);
+        const armR = new THREE.Mesh(new THREE.BoxGeometry(0.3, 1.2, 0.3), skin);
+        armR.position.set(0.7, 1.8, 0);
+        const legL = new THREE.Mesh(new THREE.BoxGeometry(0.4, 1, 0.4), kit);
         legL.position.set(-0.3, 0.5, 0);
-        const legR = new THREE.Mesh(new THREE.BoxGeometry(0.4, 1, 0.4), clothMat);
+        const legR = new THREE.Mesh(new THREE.BoxGeometry(0.4, 1, 0.4), kit);
         legR.position.set(0.3, 0.5, 0);
         
         gk.add(head, body, armL, armR, legL, legR);
         gk.position.set(0, 0, -14.5);
         scene.add(gk);
 
-        // 7. Game Logic
+        // 7. 게임 로직 및 드래그 감지
         let score = 0, attempts = 0, maxAttempts = 5, isKicking = false;
-        let startPos = { x: 0, y: 0 };
+        let startY = 0, startX = 0;
 
-        const onStart = (x, y) => { if(!isKicking) startPos = { x, y }; };
-        const onEnd = (x, y) => {
-            if(isKicking) return;
-            const dx = (x - startPos.x) / window.innerWidth;
-            const dy = (startPos.y - y) / window.innerHeight;
-            if(dy > 0.05) kickBall(dx * 25, dy * 15);
+        // 마우스/터치 시작
+        const handleStart = (x, y) => {
+            if (isKicking) return;
+            startX = x;
+            startY = y;
         };
 
-        window.addEventListener('mousedown', e => onStart(e.clientX, e.clientY));
-        window.addEventListener('mouseup', e => onEnd(e.clientX, e.clientY));
-        window.addEventListener('touchstart', e => onStart(e.touches[0].clientX, e.touches[0].clientY));
-        window.addEventListener('touchend', e => onEnd(e.changedTouches[0].clientX, e.changedTouches[0].clientY));
+        // 마우스/터치 종료 (드래그 계산)
+        const handleEnd = (x, y) => {
+            if (isKicking) return;
+            const diffX = (x - startX) / window.innerWidth;
+            const diffY = (startY - y) / window.innerHeight;
 
-        function kickBall(tx, ty) {
+            // 위로 일정 거리 이상 드래그했을 때만 발사
+            if (diffY > 0.1) {
+                kickBall(diffX * 30, diffY * 15);
+            }
+        };
+
+        window.addEventListener('mousedown', e => handleStart(e.clientX, e.clientY));
+        window.addEventListener('mouseup', e => handleEnd(e.clientX, e.clientY));
+        window.addEventListener('touchstart', e => handleStart(e.touches[0].clientX, e.touches[0].clientY));
+        window.addEventListener('touchend', e => handleEnd(e.changedTouches[0].clientX, e.changedTouches[0].clientY));
+
+        function kickBall(targetX, targetY) {
             isKicking = true;
             attempts++;
             updateUI();
 
-            const gkX = (Math.random() - 0.5) * 9;
-            new TWEEN.Tween(gk.position).to({ x: gkX }, 400).easing(TWEEN.Easing.Quadratic.Out).start();
+            // 골키퍼 수비 이동 (랜덤)
+            const gkMoveX = (Math.random() - 0.5) * 10;
+            new TWEEN.Tween(gk.position).to({ x: gkMoveX }, 400).easing(TWEEN.Easing.Quadratic.Out).start();
 
-            // Ball movement with arc
+            // 공 날아가기
             new TWEEN.Tween(ball.position)
-                .to({ x: tx, y: Math.max(0.4, ty), z: -15 }, 800)
+                .to({ x: targetX, y: Math.max(0.4, targetY), z: -15 }, 800)
                 .easing(TWEEN.Easing.Quadratic.Out)
-                .onUpdate(() => { ball.rotation.x += 0.2; })
-                .onComplete(() => checkResult(tx, ty, gkX))
+                .onUpdate(() => {
+                    ball.rotation.x += 0.3;
+                    ball.rotation.y += 0.1;
+                })
+                .onComplete(() => {
+                    checkGoal(targetX, targetY, gkMoveX);
+                })
                 .start();
         }
 
-        function checkResult(bx, by, gkx) {
+        function checkGoal(bx, by, gx) {
             const isInside = bx > -5 && bx < 5 && by < 4.5;
-            const isBlocked = Math.abs(bx - gkx) < 1.5 && by < 3;
+            const isBlocked = Math.abs(bx - gx) < 1.5 && by < 3;
             const msg = document.getElementById('msg');
             msg.style.display = 'block';
 
-            if(isInside && !isBlocked) {
-                score++; msg.innerText = "GOAL!"; msg.style.color = "yellow";
+            if (isInside && !isBlocked) {
+                score++;
+                msg.innerText = "GOAL!";
+                msg.style.color = "yellow";
             } else {
-                msg.innerText = isBlocked ? "SAVED!" : "MISS!"; msg.style.color = "white";
+                msg.innerText = isBlocked ? "SAVED!" : "MISS!";
+                msg.style.color = "white";
             }
             updateUI();
-            setTimeout(reset, 1500);
+            setTimeout(resetRound, 1500);
         }
 
-        function reset() {
+        function resetRound() {
             document.getElementById('msg').style.display = 'none';
-            if(attempts >= maxAttempts) {
-                alert(`Game Over! Score: ${score}/${maxAttempts}`);
+            if (attempts >= maxAttempts) {
+                alert(`게임 종료! 최종 점수: ${score}/${maxAttempts}`);
                 score = 0; attempts = 0;
             }
             ball.position.set(0, 0.4, 5);
